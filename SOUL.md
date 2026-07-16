@@ -66,3 +66,69 @@
 ## Evidencias de producto
 
 Sin pruebas funcionales, builds de aplicación ni flujos E2E: todavía no existe implementación productiva nueva.
+
+## Checkpoint — 2026-07-16 — Pausa antes de completar la cobertura del backlog
+
+### Estado real verificado
+
+- Fase alcanzada: estructura base fusionada y backlog documental refinado; revisión funcional todavía abierta.
+- El PR #1 fue fusionado en `main` mediante GitHub; su merge commit es `d374d39c14628b30f6ff84612324eb35603c9daf`.
+- `main` local y `origin/main` quedaron sincronizadas en `d374d39c14628b30f6ff84612324eb35603c9daf`.
+- Rama activa: `feat/refine-user-stories`, sincronizada con su rama remota antes de redactar este checkpoint.
+- Commits documentales previos del PR #2:
+  - `35f8f44598fb519c021d5f4c6d222c926795c3d2` — `docs: refine project user stories`.
+  - `3448966ff2739460937514e78c7a30562e299159` — `docs: clarify backlog assumptions`.
+- El presente checkpoint se añade a la misma rama con el mensaje `docs: record project pause checkpoint`.
+- PR #2: abierto hacia `main`, no fusionado y destinado a revisión de Codex y aprobación humana.
+- Working tree: limpio antes de iniciar la edición de este checkpoint.
+- Diff funcional del PR #2 antes del checkpoint: siete documentos autorizados; `06-code/` sin cambios.
+- Backlog existente: 9 HU (`HU-001` a `HU-009`) y 34 criterios de aceptación únicos.
+- No existe implementación productiva, prueba funcional, build de aplicación ni flujo E2E.
+- Ninguna HU ha comenzado; HU-001 tampoco está autorizada para implementación.
+
+### Avances completados
+
+- Estructura técnica base creada sin comportamiento de producto y fusionada mediante PR #1.
+- Problema, actores, flujo, requisitos oficiales, decisiones, inferencias, dudas y límites documentados.
+- Nueve HU propuestas con valor, prioridad, dependencias, fuentes, estado y criterios observables.
+- Matriz de trazabilidad y tareas técnicas separadas del backlog funcional.
+- Revisión independiente incorporada para marcar el acceso privado a browse/filtros como IN-09.
+
+### Validaciones ya observadas
+
+- 9 HU y 34 criterios de aceptación únicos.
+- Requisitos obligatorios trazados en la matriz vigente.
+- Dependencias circulares: 0; duplicados detectados: 0.
+- Secretos o datos personales detectados en el diff documental: 0.
+- `git diff --check`: PASS antes de este checkpoint.
+- Alcance del PR verificado: solo documentación autorizada; código y archivos protegidos sin cambios.
+
+### Decisiones aprobadas vigentes
+
+- Track DEV, dominio Portal de Convocatorias Públicas y flujo Git mediante PR.
+- Stack, arquitectura hexagonal, PostgreSQL 16 e integración SECOP mediante adaptador backend.
+- El frontend consume únicamente la API propia.
+- Docker Compose permanece limitado a PostgreSQL hasta aprobar entrypoints.
+- Ninguna implementación comienza sin aprobación de HU, criterios, contrato y microplan.
+
+### Decisiones e instrucciones pendientes
+
+- Resolver campos de perfil/registro, política de contraseña y ciclo de vida JWT.
+- Ratificar si browse/filtros serán privados o públicos.
+- Definir dataset, clave estable, DTO, fechas, estados, paginación y orden SECOP.
+- Resolver persistencia de bookmarks, búsquedas guardadas y políticas de resiliencia/calidad.
+- El backlog actual no contiene `HU-010` ni `HU-011`; por instrucción de pausa, todavía debe resolverse la cobertura funcional de detalle de convocatoria y dashboard.
+- No asumir que detalle y dashboard son requisitos oficiales: deben trazarse a fuente verificable o clasificarse explícitamente como inferencia/decisión antes de agregarlos, combinarlos o justificar su cobertura en HU existentes.
+- No fusionar el PR #2 hasta completar esa cobertura, repetir las validaciones y obtener revisión de Codex y aprobación humana.
+- No iniciar HU-001 ni modificar `06-code/` durante esta pausa.
+
+### Riesgos e inconsistencias conocidas
+
+- El PR #2 presenta el backlog de nueve HU como completo, pero la instrucción de pausa introduce una revisión pendiente sobre detalle y dashboard; esa inconsistencia debe resolverse antes del merge.
+- Las referencias visuales incluyen dashboard y detalle, pero por sí solas no tienen autoridad de requisito oficial.
+- Búsquedas guardadas son obligatorias en persistencia, aunque su flujo funcional oficial está menos especificado.
+- Permanecen abiertos contratos, umbrales no funcionales y semántica de integración SECOP.
+
+### Siguiente acción exacta al reanudar
+
+Revisar el diff y comentarios del PR #2; contrastar detalle de convocatoria y dashboard con las fuentes oficiales y referencias visuales; decidir si corresponden a `HU-010`/`HU-011`, a una división/combinación de HU existentes o a fuera de alcance; actualizar backlog, criterios y trazabilidad; repetir los gates documentales; solicitar revisión de Codex y aprobación humana. No fusionar ni implementar antes de esa decisión.
