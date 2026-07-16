@@ -1,0 +1,21 @@
+.DS_Store
+minitienda.db
+test.db
+.env
+**/.env
+.venv/
+**/.venv/
+.pytest_cache/
+**/.pytest_cache/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Frontend local artifacts
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+*.tsbuildinfo
+# Windows/WSL metadata streams, not project files
+*:Zone.Identifier*

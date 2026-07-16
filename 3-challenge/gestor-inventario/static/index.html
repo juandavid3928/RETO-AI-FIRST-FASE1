@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestor de Inventario</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+    h1 { margin-bottom: .25rem; }
+    h2 { margin-top: 2rem; border-bottom: 1px solid #eee; padding-bottom: .4rem; }
+    .muted { color: #666; font-size: .9rem; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .9rem; }
+    th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #eee; }
+    th { background: #f6f8fa; }
+    .alert-row { background: #fff3cd; }
+    .badge { display: inline-block; padding: .15rem .5rem; border-radius: 4px; font-size: .75rem; font-weight: 600; }
+    .badge-ok { background: #d4edda; color: #155724; }
+    .badge-low { background: #fff3cd; color: #856404; }
+    form { display: grid; gap: .75rem; max-width: 420px; margin-top: 1rem; }
+    label { display: flex; flex-direction: column; gap: .25rem; font-size: .9rem; font-weight: 500; }
+    select, input[type=number], input[type=text] { padding: .4rem .6rem; border: 1px solid #ccc; border-radius: 4px; font-size: .9rem; }
+    button { padding: .5rem 1.25rem; background: #0969da; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: .9rem; }
+    button:hover { background: #0550ae; }
+    #result { margin-top: 1rem; padding: .75rem 1rem; background: #f6f8fa; border-radius: 6px; white-space: pre-wrap; display: none; font-size: .85rem; }
+    #result.error { background: #ffeef0; border-left: 3px solid #cf222e; }
+    #result.ok { background: #dafbe1; border-left: 3px solid #1a7f37; }
+    .alerts-section { margin-top: 1rem; }
+    .no-alerts { color: #1a7f37; font-size: .9rem; }
+    .error-msg { color: #cf222e; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <h1>Gestor de Inventario</h1>
+  <p class="muted">Aplicación base para pruebas. Registra movimientos y consulta alertas de stock mínimo.</p>
+
+  <h2>Productos</h2>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>SKU</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Mín.</th><th>Estado</th></tr>
+    </thead>
+    <tbody id="products-body"></tbody>
+  </table>
+
+  <h2>Registrar movimiento de stock</h2>
+  <form id="movement-form">
+    <label>Producto
+      <select id="mov-product"></select>
+    </label>
+    <label>Tipo
+      <select id="mov-type">
+        <option value="IN">IN — Entrada</option>
+        <option value="OUT">OUT — Salida</option>
+      </select>
+    </label>
+    <label>Cantidad
+      <input type="number" id="mov-qty" min="1" value="1">
+    </label>
+    <label>Notas (opcional)
+      <input type="text" id="mov-notes" placeholder="Ej: Compra proveedor #42">
+    </label>
+    <button type="submit">Registrar movimiento</button>
+  </form>
+  <div id="result"></div>
+
+  <h2>Alertas de stock mínimo</h2>
+  <button id="refresh-alerts" style="background:#6f42c1">Consultar alertas</button>
+  <div class="alerts-section" id="alerts-section"></div>
+
+  <script>
+    const fmt = (c) => "$" + (c / 100).toLocaleString("es-CO");
+
+    async function loadProducts() {
+      const res = await fetch("/api/products");
+      const products = await res.json();
+
+      const tbody = document.getElementById("products-body");
+      tbody.innerHTML = "";
+      const select = document.getElementById("mov-product");
+      select.innerHTML = "";
+
+      for (const p of products) {
+        const isLow = p.stock <= p.min_stock;
+        const tr = document.createElement("tr");
+        if (isLow) tr.classList.add("alert-row");
+        tr.innerHTML = `
+          <td>${p.id}</td>
+          <td><code>${p.sku}</code></td>
+          <td>${p.name}</td>
+          <td>${fmt(p.price_cents)}</td>
+          <td data-stock="${p.id}"><strong>${p.stock}</strong></td>
+          <td>${p.min_stock}</td>
+          <td><span class="badge ${isLow ? "badge-low" : "badge-ok"}">${isLow ? "&#9888; Bajo" : "OK"}</span></td>`;
+        tbody.appendChild(tr);
+
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = `${p.sku} — ${p.name} (stock: ${p.stock})`;
+        select.appendChild(opt);
+      }
+    }
+
+    async function registerMovement(e) {
+      e.preventDefault();
+      const result = document.getElementById("result");
+      result.className = "";
+      result.style.display = "block";
+
+      const body = {
+        product_id: parseInt(document.getElementById("mov-product").value, 10),
+        type: document.getElementById("mov-type").value,
+        qty: parseFloat(document.getElementById("mov-qty").value),
+        notes: document.getElementById("mov-notes").value,
+      };
+
+      const res = await fetch("/api/stock/movement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        result.className = "error";
+        result.textContent = "Error " + res.status + ": " + (data.detail || JSON.stringify(data));
+        return;
+      }
+
+      result.className = "ok";
+      result.textContent =
+        `Movimiento #${data.id} registrado\n` +
+        `Tipo: ${data.type}  |  Cantidad: ${data.qty}\n` +
+        `Producto ID: ${data.product_id}\n` +
+        `Fecha: ${data.created_at}`;
+      loadProducts();
+    }
+
+    async function loadAlerts() {
+      const section = document.getElementById("alerts-section");
+      section.innerHTML = "<p class=\"muted\">Consultando...</p>";
+      const res = await fetch("/api/stock/alerts");
+      if (!res.ok) {
+        section.innerHTML = `<p class="error-msg">Error ${res.status}: Servicio de alertas no disponible.</p>`;
+        return;
+      }
+      const products = await res.json();
+      if (products.length === 0) {
+        section.innerHTML = "<p class=\"no-alerts\">&#10003; Sin alertas &mdash; todos los productos sobre el m&iacute;nimo.</p>";
+        return;
+      }
+      let html = "<table><thead><tr><th>SKU</th><th>Nombre</th><th>Stock actual</th><th>M&iacute;nimo</th></tr></thead><tbody>";
+      for (const p of products) {
+        html += `<tr class="alert-row"><td><code>${p.sku}</code></td><td>${p.name}</td><td><strong>${p.stock}</strong></td><td>${p.min_stock}</td></tr>`;
+      }
+      html += "</tbody></table>";
+      section.innerHTML = html;
+    }
+
+    document.getElementById("movement-form").addEventListener("submit", registerMovement);
+    document.getElementById("refresh-alerts").addEventListener("click", loadAlerts);
+    loadProducts();
+  </script>
+</body>
+</html>

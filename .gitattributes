@@ -1,0 +1,2 @@
+4-internal/*interna* filter=git-crypt diff=git-crypt
+4-internal/input_* filter=git-crypt diff=git-crypt
