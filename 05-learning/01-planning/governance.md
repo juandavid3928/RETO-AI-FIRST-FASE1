@@ -17,7 +17,17 @@
 
 ## Git
 
-No crear commits, ejecutar push, abrir PR ni hacer merge sin autorización explícita para esa acción.
+Flujo obligatorio para todo cambio:
+
+```text
+rama de trabajo → cambios → validaciones → commit → push de la rama → PR hacia main → revisión → merge mediante GitHub
+```
+
+- No crear commits, ejecutar push, abrir PR ni hacer merge sin autorización explícita para esa acción.
+- Después del bootstrap inicial queda prohibido hacer push directo a `main`.
+- No integrar una rama localmente ni publicar una integración directa en `main`.
+- El merge requiere un PR previamente abierto, revisión y ejecución mediante GitHub.
+- No usar force push salvo autorización excepcional, explícita y limitada a una reconstrucción controlada.
 
 ## Evidencia
 

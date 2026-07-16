@@ -12,6 +12,8 @@
 - No modificar `1-docs/`, `2-workshops/`, `3-challenge/` ni `4-internal/`.
 - No almacenar ni exponer secretos.
 - No ejecutar commit, push, PR o merge sin autorización explícita.
+- Flujo Git obligatorio: rama de trabajo → cambios → validaciones → commit → push de la rama → PR hacia `main` → revisión → merge mediante GitHub.
+- El push directo a `main` queda prohibido después de la excepción única usada para publicar la base inicial.
 - Trabajar incrementalmente con HU aprobadas.
 
 ## Decisiones vigentes
@@ -21,6 +23,7 @@
 - Backend organizado mediante arquitectura hexagonal.
 - Docker Compose contiene únicamente PostgreSQL hasta disponer de entrypoints aprobados.
 - Alcance funcional inicial: HU-001, HU-002 y HU-003.
+- La estructura se integra mediante PR; no se permite integración local ni push directo a `main`.
 
 ## Checkpoint — 2026-07-16 — Reinicio aprobado del repositorio
 
