@@ -88,7 +88,7 @@ Orden recomendado: HU-001, HU-002, HU-005, HU-003, HU-004, HU-006, HU-007, HU-00
 | Criterios observables. | AC identificados en formato Dado/Cuando/Entonces. |
 | Sin duplicados. | Browse/filtros, crear/gestionar favoritos y crear/gestionar búsquedas tienen límites distintos. |
 | Dependencias sin ciclos. | Grafo dirigido acíclico documentado. |
-| Inferencias identificadas. | IN-01 a IN-08 están separadas de fuentes oficiales y decisiones. |
+| Inferencias identificadas. | IN-01 a IN-09 están separadas de fuentes oficiales y decisiones. |
 | Tareas técnicas separadas. | TT-01 a TT-08 no están redactadas como HU. |
 | Alcance manejable. | Cada recurso persistente separa creación de consulta/eliminación. |
 
@@ -98,8 +98,10 @@ Orden recomendado: HU-001, HU-002, HU-005, HU-003, HU-004, HU-006, HU-007, HU-00
 - Faltan campos de perfil, política JWT y contraseña.
 - Faltan DTO, paginación, orden y semántica exacta de fecha/estado.
 - La política de nombre único para búsquedas guardadas es una inferencia y requiere ratificación.
+- El backlog propone browse y filtros privados a partir de “usuarios registrados”, pero debe ratificarse si habrá consulta pública.
 - Debe definirse qué snapshot mínimo conserva un bookmark y cómo se representa una convocatoria retirada.
 - Caché, reintentos, rate limits y timeouts requieren decisión técnica sin crear nuevas HU.
+- Faltan umbrales verificables de accesibilidad, rendimiento y observabilidad sin datos sensibles.
 
 ## Fuera de alcance
 

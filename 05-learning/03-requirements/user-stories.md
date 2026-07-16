@@ -54,7 +54,7 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Valor de negocio:** entrega el objetivo central del portal sin obligar al usuario a consultar directamente la fuente abierta.
 - **Prioridad:** P0.
 - **Dependencias:** HU-002.
-- **Fuente:** OF-01, OF-03, OF-04, OF-06, OF-07; AP-03, AP-04; IN-06, IN-07.
+- **Fuente:** OF-01, OF-03, OF-04, OF-06, OF-07; AP-03, AP-04; IN-06, IN-07, IN-09.
 - **Estado:** HU-003 original modificada y acotada al browse; pendiente de aprobación para implementación.
 - **Criterios:** AC-HU-003-01 a AC-HU-003-05.
 
@@ -65,7 +65,7 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Valor de negocio:** disminuye el esfuerzo de revisión sobre un volumen amplio de contratación pública.
 - **Prioridad:** P0.
 - **Dependencias:** HU-003.
-- **Fuente:** OF-01, OF-03, OF-06; IN-02, IN-08.
+- **Fuente:** OF-01, OF-03, OF-06; IN-02, IN-08, IN-09.
 - **Estado:** agregada al dividir el alcance de búsqueda de la HU-003 original; pendiente de aprobación para implementación.
 - **Criterios:** AC-HU-004-01 a AC-HU-004-04.
 

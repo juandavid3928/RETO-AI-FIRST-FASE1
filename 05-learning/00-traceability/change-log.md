@@ -70,9 +70,10 @@ Bitácora técnica iniciada después del onboarding y la aprobación de reconstr
 - Se separaron ocho tareas técnicas habilitadoras de las historias de usuario.
 
 **Validaciones observadas:**
-- Verificación documental ad hoc: 7 rutas autorizadas, 9 HU, 34 criterios, 9 requisitos oficiales, 8 inferencias y 8 tareas técnicas; 0 ciclos y 0 fallos.
+- Verificación documental ad hoc inicial: 7 rutas autorizadas, 9 HU, 34 criterios, 9 requisitos oficiales, 8 inferencias y 8 tareas técnicas; 0 ciclos y 0 fallos.
 - `git diff --check`: PASS.
 - El primer intento del verificador produjo falsos negativos al no aceptar las flexiones «Dada/Dados»; se corrigió únicamente el harness temporal y se repitió con resultado PASS.
+- Una revisión independiente posterior confirmó la cobertura y detectó que el acceso privado a browse/filtros debía marcarse como IN-09; también separó las restricciones AI-First de las HU.
 
 **Áreas afectadas:**
 - `05-learning/03-requirements/`

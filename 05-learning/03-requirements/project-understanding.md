@@ -76,8 +76,19 @@ Contratistas y proveedores necesitan identificar oportunidades de contratación 
 | IN-06 | La interfaz diferencia loading, results, empty y error. | Son estados observables mínimos de una consulta remota y una decisión vigente de diseño. |
 | IN-07 | La identidad de la convocatoria proviene de una clave estable del dataset acordado. | Favoritos persistentes requieren volver a identificar la oportunidad externa. |
 | IN-08 | El filtro oficial por fecha se modela como un rango inclusivo con inicio y fin. | Un rango ofrece un criterio útil y verificable para convocatorias; el enunciado no fija todavía su semántica exacta. |
+| IN-09 | Explorar y filtrar convocatorias requiere una sesión autenticada. | El enunciado atribuye estas capacidades a “usuarios registrados”, pero no prohíbe expresamente un browse público. |
 
 Estas inferencias deben ser ratificadas o sustituidas durante la revisión del backlog; no se presentan como texto oficial.
+
+## Restricciones transversales del reto — no son HU
+
+- La persona especifica, dirige, revisa e itera; el código se genera mediante IA y no manualmente.
+- Hermes es el agente principal y canaliza el uso de los LLM de implementación.
+- El dominio permanece fijo como Portal de Convocatorias Públicas.
+- La entrega usa un repositorio público y debe ser ejecutable localmente.
+- `SOUL.md`, README, demo y trazabilidad son entregables o evidencia, no valor funcional autónomo.
+- Credenciales y secretos no se almacenan en código ni documentación versionada.
+- Seguridad, resiliencia, accesibilidad, observabilidad y rendimiento se tratan como atributos transversales; sus umbrales medibles deben aprobarse con los contratos y microplanes.
 
 ## Reglas de negocio propuestas
 
@@ -128,3 +139,5 @@ Estas inferencias deben ser ratificadas o sustituidas durante la revisión del b
 7. Longitud del nombre de búsqueda guardada y política para renombrar o actualizar criterios.
 8. Política de caché, rate limits, reintentos y timeouts.
 9. Enlace o campos mínimos para consultar la fuente original sin crear una HU de detalle ampliado.
+10. Ratificar si browse y filtros serán privados como propone IN-09 o también estarán disponibles sin sesión.
+11. Definir objetivos medibles de accesibilidad, rendimiento y logging sin datos sensibles.

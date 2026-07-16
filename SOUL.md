@@ -23,7 +23,7 @@
 - Backend organizado mediante arquitectura hexagonal.
 - Docker Compose contiene únicamente PostgreSQL hasta disponer de entrypoints aprobados.
 - Backlog funcional propuesto para revisión: HU-001 a HU-009; no autoriza implementación.
-- La estructura se integra mediante PR; no se permite integración local ni push directo a `main`.
+- La estructura fue integrada mediante PR; todo cambio posterior mantiene prohibidos la integración local y el push directo a `main`.
 
 ## Checkpoint — 2026-07-16 — Reinicio aprobado del repositorio
 
@@ -57,7 +57,7 @@
 ## Checkpoint — 2026-07-16 — Refinamiento integral del backlog
 
 - Se contrastó el alcance inicial con el enunciado oficial Track DEV, la guía del programa y la documentación vigente.
-- Se separaron requisitos oficiales, decisiones aprobadas, inferencias y dudas.
+- Se separaron requisitos oficiales, decisiones aprobadas, nueve inferencias y dudas.
 - Backlog propuesto: nueve HU para registro, login, browse SECOP, filtros, perfil, favoritos y búsquedas guardadas.
 - Se definieron criterios observables, fuentes, valor, prioridad y dependencias sin ciclos.
 - Las tareas técnicas permanecen separadas de las historias de usuario.
