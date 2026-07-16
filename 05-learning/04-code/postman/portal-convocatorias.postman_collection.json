@@ -1,0 +1,11 @@
+{
+  "info": {
+    "name": "Portal de Convocatorias - plantilla",
+    "description": "Colección neutral. Agregar requests solo cuando la HU y el contrato estén aprobados.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://localhost:8000"}
+  ],
+  "item": []
+}
