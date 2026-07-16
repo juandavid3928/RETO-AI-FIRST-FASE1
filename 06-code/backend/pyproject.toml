@@ -1,0 +1,21 @@
+[project]
+name = "portal-convocatorias-backend"
+version = "0.0.0"
+description = "Base structure for the AI-First reconstruction"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi",
+  "pydantic-settings",
+  "psycopg[binary]",
+  "uvicorn[standard]",
+]
+
+[dependency-groups]
+dev = [
+  "httpx",
+  "pytest",
+  "pytest-asyncio",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
