@@ -21,7 +21,8 @@ frontend/
 │   └── styles/index.css
 └── tests/
     ├── setup.ts
-    ├── {register,login,authSession}.test.tsx
+    ├── {register,login}.test.tsx
+    ├── authSession.test.ts
     └── e2e/{register,login}.spec.ts
 ```
 
