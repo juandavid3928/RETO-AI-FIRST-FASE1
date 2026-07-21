@@ -8,6 +8,8 @@ dependencies = [
   "pydantic-settings",
   "psycopg[binary]",
   "uvicorn[standard]",
+  "pwdlib[argon2]>=0.3.0",
+  "alembic>=1.18.5",
 ]
 
 [dependency-groups]
@@ -19,3 +21,4 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]

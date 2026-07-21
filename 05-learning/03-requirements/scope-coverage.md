@@ -9,10 +9,10 @@ Matriz propuesta para revisión. El backlog cubre el producto mínimo oficial si
 | Requisito | Descripción resumida | Historias que lo cubren | Cobertura |
 |---|---|---|---|
 | OF-01 | Explorar, filtrar y guardar convocatorias como usuario registrado. | HU-001, HU-002, HU-003, HU-004, HU-006, HU-007. | Completa. |
-| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Completa; campos y políticas pendientes. |
+| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Registro implementado; login/JWT y perfil pendientes. |
 | OF-03 | REST para búsqueda, filtros y bookmarks. | HU-003, HU-004, HU-006, HU-007, HU-010. | Completa a nivel funcional; HU-010 reutiliza el contrato mínimo de convocatoria. |
 | OF-04 | Web funcional para browse, favoritos y perfil. | HU-003, HU-004, HU-005, HU-006, HU-007, HU-010, HU-011. | Completa a nivel funcional; detalle y dashboard se limitan a AP-07. |
-| OF-05 | Persistencia de usuarios, bookmarks y búsquedas guardadas. | HU-001, HU-005, HU-006, HU-007, HU-008, HU-009. | Completa; modelo físico pendiente. |
+| OF-05 | Persistencia de usuarios, bookmarks y búsquedas guardadas. | HU-001, HU-005, HU-006, HU-007, HU-008, HU-009. | Modelo físico de usuarios implementado; bookmarks y búsquedas pendientes. |
 | OF-06 | Consulta SECOP en vivo por entidad, fecha y estado. | HU-003, HU-004, HU-009. | Completa; dataset y mapeo pendientes. |
 | OF-07 | E2E auth + browse + bookmarks persistidos. | HU-001, HU-002, HU-003, HU-006, HU-007, HU-010. | Completa como flujo incremental; el detalle mínimo apoya la decisión previa al bookmark. |
 | OF-08 | Aplicación local con backend, frontend, DB e integración. | TT-02, TT-04, TT-05, TT-07 y slices de todas las HU. | Tarea de entrega, no HU independiente. |
@@ -22,7 +22,7 @@ Matriz propuesta para revisión. El backlog cubre el producto mínimo oficial si
 
 | HU | Fuente principal | Dependencias | Prioridad | Estado |
 |---|---|---|---|---|
-| HU-001 | OF-01, OF-02, OF-05 | — | P0 | Refinada; pendiente de aprobación. |
+| HU-001 | OF-01, OF-02, OF-05 | — | P0 | Implementada y validada; pendiente de revisión y merge. |
 | HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Refinada; pendiente de aprobación. |
 | HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Refinada; pendiente de aprobación. |
 | HU-004 | OF-01, OF-03, OF-06 | HU-003 | P0 | Agregada por división; pendiente. |
@@ -101,7 +101,7 @@ Orden recomendado: HU-001, HU-002, HU-005, HU-003, HU-004, HU-010, HU-006, HU-00
 ## Riesgos y decisiones pendientes
 
 - La fuente oficial ofrece un endpoint SECOP I como ejemplo, pero no fija el dataset definitivo.
-- Faltan campos de perfil, política JWT y contraseña.
+- La política de contraseña y los campos de registro de HU-001 están resueltos; faltan campos de perfil y política JWT para historias posteriores.
 - Faltan DTO, paginación, orden y semántica exacta de fecha/estado.
 - La política de nombre único para búsquedas guardadas es una inferencia y requiere ratificación.
 - El backlog propone browse y filtros privados a partir de “usuarios registrados”, pero debe ratificarse si habrá consulta pública.

@@ -1,4 +1,4 @@
-# Árbol backend aprobado
+# Árbol backend vigente
 
 ```text
 backend/
@@ -6,34 +6,29 @@ backend/
 ├── README.md
 ├── pyproject.toml
 ├── uv.lock
-├── .python-version
-├── .env.example
+├── alembic.ini
+├── alembic/
+│   ├── env.py
+│   └── versions/20260721_0001_create_users.py
 ├── app/
-│   ├── __init__.py
+│   ├── main.py
+│   ├── bootstrap.py
 │   ├── domain/
-│   │   └── __init__.py
+│   │   ├── errors.py
+│   │   └── user.py
 │   ├── application/
-│   │   ├── __init__.py
-│   │   ├── ports/
-│   │   │   └── __init__.py
-│   │   └── use_cases/
-│   │       └── __init__.py
+│   │   ├── errors.py
+│   │   ├── ports/{clock,id_generator,password_hasher,user_repository}.py
+│   │   └── use_cases/register_user.py
 │   ├── infrastructure/
-│   │   ├── __init__.py
-│   │   ├── database/
-│   │   │   └── __init__.py
-│   │   └── external/
-│   │       └── __init__.py
-│   ├── interfaces/
-│   │   ├── __init__.py
-│   │   └── api/
-│   │       ├── __init__.py
-│   │       └── v1/
-│   │           └── __init__.py
-│   └── core/
-│       └── __init__.py
+│   │   ├── database/postgres_user_repository.py
+│   │   ├── password_hasher.py
+│   │   └── system.py
+│   └── interfaces/api/app.py
 └── tests/
-    └── .gitkeep
+    ├── unit/
+    ├── api/
+    └── integration/
 ```
 
-Todos los paquetes están vacíos de comportamiento productivo.
+Los paquetes usan `__init__.py`. HU-001 es la única lógica productiva: dominio y aplicación no importan FastAPI, Pydantic, psycopg, pwdlib ni infraestructura. HU-002, SECOP y las demás historias permanecen sin implementar.

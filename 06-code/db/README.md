@@ -1,5 +1,5 @@
 # Database
 
-PostgreSQL 16 es el servicio inicial de Docker Compose. Las carpetas de migraciones, seeds, schemas, índices, scripts y datos de prueba permanecen vacías.
+PostgreSQL 16 persiste las cuentas de HU-001. La migración ejecutable reside junto al backend en `backend/alembic/`, de modo que el mismo artefacto que inicia la API la aplica antes de servir tráfico.
 
-No existen tablas, SQL ni herramienta de migración adoptada.
+Alembic ejecuta SQL explícito para crear y retirar `users`; el runtime utiliza psycopg sin ORM. No existen seeds ni datos personales de ejemplo.

@@ -17,5 +17,9 @@ node_modules/
 dist/
 **/dist/
 *.tsbuildinfo
+test-results/
+**/test-results/
+playwright-report/
+**/playwright-report/
 # Windows/WSL metadata streams, not project files
 *:Zone.Identifier*
