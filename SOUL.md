@@ -163,3 +163,28 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Evidencia GREEN fresca: backend `32 passed`; frontend `8 passed`; build Vite exitoso; Playwright E2E `1 passed`; `npm audit` sin vulnerabilidades; `uv lock --check` y Compose válidos.
 - Seguridad: SQL parametrizado, rollback/close de mejor esfuerzo sin ocultar indisponibilidad, Argon2id, errores sin detalles internos, límite real de 4 KiB y ausencia de password/hash/JWT en respuestas o almacenamiento frontend.
 - Estado: implementación pendiente de revisión mediante PR; no se hizo merge y HU-002 no fue iniciada.
+
+## Checkpoint — 2026-07-21 — HU-002 login JWT local
+
+- Alcance: login como segundo incremento vertical sobre HU-001; HU-005, perfil y demás recursos privados no fueron iniciados.
+- Contrato: JSON estricto `email`/`password`, password opaca de 1..128, respuesta Bearer con TTL 1800, errores uniformes y cuerpo máximo de 4 KiB.
+- Arquitectura: casos de uso de autenticación/validación dependen de puertos; FastAPI, Pydantic, psycopg, pwdlib y PyJWT permanecen fuera de dominio/aplicación.
+- Seguridad: Argon2id y hash dummy, HS256 fijo, UUID4/issuer/audience/`iat`/`exp` tipados, TTL exacto, leeway 30, secreto runtime base64url mínimo 32 bytes, headers no-store y Bearer sin OAuth2 form.
+- UI: `/login` persiste únicamente `{ accessToken, expiresAt }` bajo `portal.auth.session`, valida estructura, restaura/expira, limpia estado y temporizadores, y realiza logout exclusivamente cliente.
+- TDD: RED/GREEN cubrió credenciales uniformes, JWT alterado/claims/ventana, configuración fail-fast, API, PostgreSQL, storage, contrato 200 y UI accesible.
+- Evidencia actual: backend unitario/API 70 passed; JWT focalizado 25 passed; frontend 27 passed; build Vite, locks, audit, frontera hexagonal y `git diff --check` en verde.
+- Validación integral: PostgreSQL 16 vacío + Alembic; backend 76 passed; frontend 27 passed; build/audit; y Playwright conjunto registro/login 2 passed después de restaurar el esquema desmontado por la prueba explícita de downgrade.
+- Revisión: un primer FAIL independiente detectó TTL/audience y documentación; tras los correctivos, una segunda revisión independiente emitió PASS sin bloqueantes sobre un snapshot estable.
+- Riesgos: `localStorage` mantiene riesgo XSS residual, logout no revoca JWT y rate limiting queda como hardening previo a producción.
+- Estado Git: cambios locales en `feat/hu-002-user-login`; sin commit, push ni merge.
+
+## Checkpoint — 2026-07-21 — Hardening de sesión frontend HU-002
+
+- Avance verificado: sesión extraída a un módulo dedicado, contrato `200` exacto, sincronización multitab y reevaluación al recuperar visibilidad; `authenticatedFetch` permanece explícitamente pendiente.
+- Alcance/HU: solo HU-002 frontend y su documentación; HU-005 y llamadas privadas no fueron iniciadas.
+- Evidencia RED: 8 fallos focalizados de contrato/multitab/visibilidad/cleanup, fallo inicial por ausencia del módulo y 2 RED adicionales para JSON `200` inválido/campos de sesión extra.
+- Evidencia de suites: frontend 41 passed; backend PostgreSQL 16 real 76 passed; Playwright registro/login 2 passed; build Vite, audit, lock, Compose config, CSP/cabeceras, escaneo de secretos y `git diff --check` en verde.
+- Recuperación validada: la prueba de downgrade dejó una sola tabla de control; `alembic upgrade head` restauró `users` y `alembic_version` antes del E2E.
+- Limpieza: contenedores, red, volumen, env efímero, script temporal y artefactos Playwright eliminados por trap.
+- Riesgos: continúan el riesgo XSS residual de `localStorage`, la ausencia de revocación inmediata y el rate limiting pendiente.
+- Próximo paso: crear y publicar el commit `fix: harden frontend authentication session` en el PR #4, sin merge.
