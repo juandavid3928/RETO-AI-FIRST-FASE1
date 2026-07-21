@@ -4,7 +4,7 @@ import psycopg
 from psycopg.errors import UniqueViolation
 
 from app.application.errors import DatabaseUnavailable, DuplicateEmail
-from app.domain.user import User
+from app.domain.user import Email, User, UserId
 
 
 def _best_effort(operation: Callable[[], None]) -> None:
@@ -56,6 +56,27 @@ class PostgresUserRepository:
             if connection is not None:
                 _best_effort(connection.rollback)
             raise
+        finally:
+            if connection is not None:
+                _best_effort(connection.close)
+
+    def get_by_email(self, email: str) -> User | None:
+        connection: psycopg.Connection | None = None
+        try:
+            connection = self._connect(self._database_url)
+            row = connection.execute(
+                """
+                SELECT id, email, password_hash, created_at, updated_at
+                FROM users
+                WHERE email = %s
+                """,
+                (email,),
+            ).fetchone()
+            if row is None:
+                return None
+            return User(UserId(row[0]), Email(row[1]), row[2], row[3], row[4])
+        except psycopg.OperationalError:
+            raise DatabaseUnavailable from None
         finally:
             if connection is not None:
                 _best_effort(connection.close)

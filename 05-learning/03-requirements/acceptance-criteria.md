@@ -2,7 +2,7 @@
 
 ## Estado y convención
 
-Los criterios de HU-001 están aprobados con el contrato de registro. Los criterios de HU-002 a HU-011 permanecen propuestos y no autorizan su implementación.
+Los criterios de HU-001 y HU-002 están aprobados con sus contratos de registro y login JWT. Los criterios de HU-003 a HU-011 permanecen propuestos y no autorizan su implementación.
 
 ## HU-001 — Crear una cuenta
 

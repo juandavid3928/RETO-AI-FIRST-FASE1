@@ -89,3 +89,42 @@ def test_broken_rollback_does_not_mask_database_unavailable() -> None:
         repository.add(user())
 
     assert connection.close_count == 1
+
+
+class LookupConnectionStub:
+    def __init__(self, row):
+        self.row = row
+        self.query = None
+        self.parameters = None
+        self.close_count = 0
+
+    def execute(self, query, parameters):
+        self.query = query
+        self.parameters = parameters
+        return self
+
+    def fetchone(self):
+        return self.row
+
+    def close(self):
+        self.close_count += 1
+
+
+def test_get_by_email_uses_parameterized_query_and_maps_user() -> None:
+    identifier = uuid4()
+    now = datetime.now(UTC)
+    connection = LookupConnectionStub((identifier, "person@example.com", "$argon2id$hash", now, now))
+    repository = PostgresUserRepository("unused", connect=cast(Any, lambda _: connection))
+
+    found = repository.get_by_email("person@example.com")
+
+    assert found == User(UserId(identifier), Email("person@example.com"), "$argon2id$hash", now, now)
+    assert connection.parameters == ("person@example.com",)
+    assert "%s" in connection.query
+    assert connection.close_count == 1
+
+
+def test_get_by_email_returns_none_when_absent() -> None:
+    connection = LookupConnectionStub(None)
+    repository = PostgresUserRepository("unused", connect=cast(Any, lambda _: connection))
+    assert repository.get_by_email("missing@example.com") is None

@@ -15,13 +15,13 @@ frontend/
 ├── src/
 │   ├── main.tsx
 │   ├── app/App.tsx
-│   ├── pages/RegisterPage.tsx
-│   ├── services/register.ts
+│   ├── pages/{RegisterPage,LoginPage}.tsx
+│   ├── services/{register,login}.ts
 │   └── styles/index.css
 └── tests/
     ├── setup.ts
-    ├── register.test.tsx
-    └── e2e/register.spec.ts
+    ├── {register,login}.test.tsx
+    └── e2e/{register,login}.spec.ts
 ```
 
-La única ruta productiva es `/register`. El formulario no implementa `/login`, no persiste credenciales y consume exclusivamente `POST /api/v1/auth/register` a través del backend propio.
+Las rutas productivas son `/register` y `/login`. Login consume `POST /api/v1/auth/login`, conserva únicamente token/expiración bajo `portal.auth.session`, restaura o expira la sesión localmente y realiza logout cliente. No existe todavía una pantalla privada de HU-005.

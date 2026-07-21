@@ -7,3 +7,12 @@ class Argon2PasswordHasher:
 
     def hash(self, password: str) -> str:
         return self._password_hash.hash(password)
+
+    def verify(self, password: str, password_hash: str) -> bool:
+        try:
+            return self._password_hash.verify(password, password_hash)
+        except Exception:
+            return False
+
+    def dummy_hash(self) -> str:
+        return self._password_hash.hash("dummy password used only to equalize login work")

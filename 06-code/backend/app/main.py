@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     db_name: str | None = None
     db_user: str | None = None
     db_password: str | None = None
+    jwt_secret: str
 
     def database_conninfo(self) -> str:
         return build_database_conninfo(
@@ -24,4 +25,5 @@ class Settings(BaseSettings):
         )
 
 
-app = build_app(Settings().database_conninfo())
+settings = Settings()
+app = build_app(settings.database_conninfo(), settings.jwt_secret)

@@ -2,7 +2,7 @@
 
 ## Estado
 
-Backlog funcional completo. HU-001 fue aprobada e implementada como primer incremento; HU-002 a HU-011 no autorizan implementación y requieren aprobación de criterios, contrato y microplan.
+Backlog funcional completo. HU-001 fue fusionada y HU-002 fue aprobada e implementada localmente como segundo incremento; HU-003 a HU-011 no autorizan implementación y requieren aprobación de criterios, contrato y microplan.
 
 Prioridad:
 
@@ -35,7 +35,7 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Prioridad:** P0.
 - **Dependencias:** ninguna HU.
 - **Fuente:** OF-01, OF-02, OF-05.
-- **Estado:** implementada y validada end-to-end; pendiente de revisión y merge, sin iniciar HU-002.
+- **Estado:** implementada, validada y fusionada en `main`.
 - **Criterios:** AC-HU-001-01 a AC-HU-001-06 en `acceptance-criteria.md`.
 
 ## HU-002 — Iniciar sesión
@@ -46,7 +46,7 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Prioridad:** P0.
 - **Dependencias:** HU-001.
 - **Fuente:** OF-01, OF-02, OF-07.
-- **Estado:** conservada y refinada; pendiente de aprobación para implementación.
+- **Estado:** aprobada, implementada y validada localmente en `feat/hu-002-user-login`; pendiente de publicación y revisión mediante PR.
 - **Criterios:** AC-HU-002-01 a AC-HU-002-03.
 
 ## HU-003 — Explorar convocatorias vigentes

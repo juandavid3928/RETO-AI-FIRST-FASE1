@@ -2,14 +2,14 @@
 
 ## Estado
 
-Matriz propuesta para revisión. El backlog cubre el producto mínimo oficial sin autorizar código.
+Matriz vigente. HU-001 y HU-002 tienen implementación autorizada; el resto del backlog cubre el producto mínimo oficial sin autorizar código adicional.
 
 ## Matriz requisito → historias
 
 | Requisito | Descripción resumida | Historias que lo cubren | Cobertura |
 |---|---|---|---|
 | OF-01 | Explorar, filtrar y guardar convocatorias como usuario registrado. | HU-001, HU-002, HU-003, HU-004, HU-006, HU-007. | Completa. |
-| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Registro implementado; login/JWT y perfil pendientes. |
+| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Registro y login/JWT implementados; perfil pendiente. |
 | OF-03 | REST para búsqueda, filtros y bookmarks. | HU-003, HU-004, HU-006, HU-007, HU-010. | Completa a nivel funcional; HU-010 reutiliza el contrato mínimo de convocatoria. |
 | OF-04 | Web funcional para browse, favoritos y perfil. | HU-003, HU-004, HU-005, HU-006, HU-007, HU-010, HU-011. | Completa a nivel funcional; detalle y dashboard se limitan a AP-07. |
 | OF-05 | Persistencia de usuarios, bookmarks y búsquedas guardadas. | HU-001, HU-005, HU-006, HU-007, HU-008, HU-009. | Modelo físico de usuarios implementado; bookmarks y búsquedas pendientes. |
@@ -22,8 +22,8 @@ Matriz propuesta para revisión. El backlog cubre el producto mínimo oficial si
 
 | HU | Fuente principal | Dependencias | Prioridad | Estado |
 |---|---|---|---|---|
-| HU-001 | OF-01, OF-02, OF-05 | — | P0 | Implementada y validada; pendiente de revisión y merge. |
-| HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Refinada; pendiente de aprobación. |
+| HU-001 | OF-01, OF-02, OF-05 | — | P0 | Implementada, validada y fusionada. |
+| HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Implementada y validada localmente; pendiente de publicación y revisión mediante PR. |
 | HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Refinada; pendiente de aprobación. |
 | HU-004 | OF-01, OF-03, OF-06 | HU-003 | P0 | Agregada por división; pendiente. |
 | HU-005 | OF-02, OF-04 | HU-002 | P0 | Agregada; pendiente. |

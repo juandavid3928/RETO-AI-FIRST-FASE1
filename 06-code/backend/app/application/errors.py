@@ -4,3 +4,11 @@ class DuplicateEmail(Exception):
 
 class DatabaseUnavailable(Exception):
     pass
+
+
+class InvalidCredentials(Exception):
+    pass
+
+
+class InvalidAccessToken(Exception):
+    pass

@@ -128,3 +128,30 @@ Bitácora técnica iniciada después del onboarding y la aprobación de reconstr
 - Compose: build de ambos entrypoints y arranque saludable de los tres servicios; prueba de configuración exitosa.
 
 Los fallos RED observados antes de cada segmento quedaron fuera del repositorio en `/tmp/hu001-red-evidence.txt`.
+
+## 2026-07-21 — Implement HU-002 user login with JWT
+
+**Tipo:** requisitos | backend | seguridad | frontend | pruebas | documentación
+
+**Alcance:** HU-002 implementada localmente sobre HU-001 en `feat/hu-002-user-login`, sin iniciar HU-005 ni crear una ruta privada productiva.
+
+**Resultados:**
+- `POST /api/v1/auth/login` recibe JSON estricto con email canónico y password opaca, responde JWT Bearer temporal y mantiene idéntico `401 invalid_credentials` para cuenta inexistente o password incorrecta.
+- Argon2id verifica hashes reales y ejecuta un hash dummy equivalente cuando no existe la cuenta; PostgreSQL se consulta con SQL parametrizado.
+- JWT PyJWT HS256 fija algoritmo, `sub` UUID4, issuer, audience, `iat`, `exp`, TTL de 1800 segundos y leeway de validación de 30 segundos; el secreto base64url de mínimo 32 bytes es obligatorio al arrancar.
+- La dependencia Bearer productiva diferencia token ausente e inválido, pero solo se conecta a una ruta protegida dentro de tests.
+- `/login` cubre validación, doble envío, errores, persistencia mínima `portal.auth.session`, restauración, expiración y logout cliente; Nginx añade CSP y cabeceras de hardening.
+
+**Evidencia vigente:**
+- RED reproducido para `aud` no string, TTL distinto y `exp < iat`; GREEN posterior: `tests/unit/test_jwt_access_token.py` → 25 passed.
+- Backend unitario/API posterior al correctivo JWT: 70 passed; advertencia no bloqueante de Starlette/TestClient.
+- Frontend posterior a los ajustes de storage/contrato: 27 passed y build Vite exitoso.
+- Verificación ad hoc: locks, frontera hexagonal, seguridad estática y `git diff --check` en verde.
+- PostgreSQL 16 sobre volumen vacío aplicó Alembic `20260721_0001`; backend completo contra esa instancia → 76 passed.
+- La primera corrida E2E conjunta produjo RED porque la prueba de downgrade de la suite backend dejó el esquema desmontado para el proceso externo. Se reaplicó `alembic upgrade head` y la repetición conjunta registro/login → 2 passed.
+- El E2E de login verificó usuario realmente persistido, firma HS256, claims/TTL, storage exacto, restauración, expiración controlada, reautenticación y logout con limpieza.
+- Frontend → 27 passed; build Vite exitoso; audit 0 vulnerabilidades; Compose config y CSP en verde.
+
+**Revisión independiente:** el primer veredicto fue FAIL por ventana temporal JWT, `aud` no tipado y documentación obsoleta. Tras los correctivos TDD y documentales, una segunda revisión estable del snapshot emitió PASS sin bloqueantes; verificó adversarialmente audience, TTL y orden temporal, además del manejo frontend de storage y respuestas `200` malformadas.
+
+**Límites y riesgos:** `localStorage` conserva riesgo residual XSS pese a CSP; logout no revoca un token robado antes de `exp`; rate limiting permanece como hardening pendiente aprobado fuera del incremento. No se hizo commit, push ni merge.
