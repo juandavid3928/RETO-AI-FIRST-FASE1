@@ -177,3 +177,14 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Revisión: un primer FAIL independiente detectó TTL/audience y documentación; tras los correctivos, una segunda revisión independiente emitió PASS sin bloqueantes sobre un snapshot estable.
 - Riesgos: `localStorage` mantiene riesgo XSS residual, logout no revoca JWT y rate limiting queda como hardening previo a producción.
 - Estado Git: cambios locales en `feat/hu-002-user-login`; sin commit, push ni merge.
+
+## Checkpoint — 2026-07-21 — Hardening de sesión frontend HU-002
+
+- Avance verificado: sesión extraída a un módulo dedicado, contrato `200` exacto, sincronización multitab y reevaluación al recuperar visibilidad; `authenticatedFetch` permanece explícitamente pendiente.
+- Alcance/HU: solo HU-002 frontend y su documentación; HU-005 y llamadas privadas no fueron iniciadas.
+- Evidencia RED: 8 fallos focalizados de contrato/multitab/visibilidad/cleanup, fallo inicial por ausencia del módulo y 2 RED adicionales para JSON `200` inválido/campos de sesión extra.
+- Evidencia de suites: frontend 41 passed; backend PostgreSQL 16 real 76 passed; Playwright registro/login 2 passed; build Vite, audit, lock, Compose config, CSP/cabeceras, escaneo de secretos y `git diff --check` en verde.
+- Recuperación validada: la prueba de downgrade dejó una sola tabla de control; `alembic upgrade head` restauró `users` y `alembic_version` antes del E2E.
+- Limpieza: contenedores, red, volumen, env efímero, script temporal y artefactos Playwright eliminados por trap.
+- Riesgos: continúan el riesgo XSS residual de `localStorage`, la ausencia de revocación inmediata y el rate limiting pendiente.
+- Próximo paso: crear y publicar el commit `fix: harden frontend authentication session` en el PR #4, sin merge.

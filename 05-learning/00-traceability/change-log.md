@@ -155,3 +155,17 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 **Revisión independiente:** el primer veredicto fue FAIL por ventana temporal JWT, `aud` no tipado y documentación obsoleta. Tras los correctivos TDD y documentales, una segunda revisión estable del snapshot emitió PASS sin bloqueantes; verificó adversarialmente audience, TTL y orden temporal, además del manejo frontend de storage y respuestas `200` malformadas.
 
 **Límites y riesgos:** `localStorage` conserva riesgo residual XSS pese a CSP; logout no revoca un token robado antes de `exp`; rate limiting permanece como hardening pendiente aprobado fuera del incremento. No se hizo commit, push ni merge.
+
+## 2026-07-21 — Harden HU-002 frontend authentication session
+
+**Alcance:** correctivo frontend de HU-002 sobre el PR #4; no se añadió cliente autenticado, llamada privada ni capacidad de HU-005.
+
+**Cambios:**
+- `auth/authSession.ts` centraliza clave, contrato exacto, persistencia, restauración, expiración y limpieza segura.
+- La respuesta `200` exige exactamente JWT estructural, `token_type: "bearer"` y `expires_in: 1800`; una respuesta malformada limpia sesión y contraseña.
+- `LoginPage` sincroniza login, logout y expiración mediante `storage`, reevalúa al recuperar visibilidad y desmonta listeners/temporizador.
+- `authenticatedFetch` queda documentado como pendiente hasta la primera capacidad privada autorizada.
+
+**Evidencia RED:** la suite focalizada produjo 8 fallos reproducibles para contrato, multitab, visibilidad y cleanup; el test del módulo falló inicialmente porque el módulo todavía no existía. Una revisión posterior añadió 2 RED para JSON `200` inválido y campos extra en la sesión persistida.
+
+**Evidencia GREEN fresca:** frontend 41 passed y build Vite exitoso; backend completo contra PostgreSQL 16 real 76 passed; esquema restaurado con `alembic upgrade head` después de la prueba de downgrade; E2E conjunto registro/login 2 passed; audit 0, lock, Compose config, CSP/cabeceras, escaneo de secretos y `git diff --check` en verde. La infraestructura usó puertos efímeros libres y fue eliminada junto con volumen, red, temporales y artefactos Playwright.

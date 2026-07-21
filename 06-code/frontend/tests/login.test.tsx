@@ -20,7 +20,7 @@ afterEach(() => {
 })
 
 function renderLogin() {
-  render(<App />)
+  return render(<App />)
 }
 
 describe('/login', () => {
@@ -85,18 +85,18 @@ describe('/login', () => {
       body: JSON.stringify({ email: 'person@example.com', password: ' ' }),
     })
 
-    resolveRequest(new Response(JSON.stringify({ access_token: 'aaa.bbb.ccc', expires_in: 60 }), { status: 200 }))
+    resolveRequest(new Response(JSON.stringify({ access_token: 'aaa.bbb.ccc', token_type: 'bearer', expires_in: 1800 }), { status: 200 }))
 
     expect(await screen.findByRole('status')).toHaveTextContent('You are authenticated.')
     expect(screen.getByRole('button', { name: 'Log out' })).toBeEnabled()
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
-    expect(localStorage.getItem(SESSION_KEY)).toBe(JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 61_000 }))
+    expect(localStorage.getItem(SESSION_KEY)).toBe(JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 1_801_000 }))
     expect(window.location.pathname).toBe('/login')
   })
 
   it('trims only the email before validation and submission', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(
-      JSON.stringify({ access_token: 'aaa.bbb.ccc', expires_in: 60 }),
+      JSON.stringify({ access_token: 'aaa.bbb.ccc', token_type: 'bearer', expires_in: 1800 }),
       { status: 200 },
     ))
     renderLogin()
@@ -113,7 +113,7 @@ describe('/login', () => {
 
   it('treats a malformed 200 token contract as a server error without persisting it', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(
-      JSON.stringify({ access_token: 'not-a-jwt', expires_in: 60 }),
+      JSON.stringify({ access_token: 'not-a-jwt', token_type: 'bearer', expires_in: 1800 }),
       { status: 200 },
     ))
     renderLogin()
@@ -123,6 +123,38 @@ describe('/login', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('We could not sign you in. Try again.')
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull()
+  })
+
+  it('treats a non-JSON 200 response as a generic server error and clears the password', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('not-json', { status: 200 }))
+    renderLogin()
+    const user = userEvent.setup()
+    await user.type(screen.getByLabelText('Email'), 'person@example.com')
+    await user.type(screen.getByLabelText('Password'), 'password')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('We could not sign you in. Try again.')
+    expect(screen.getByLabelText('Password')).toHaveValue('')
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull()
+  })
+
+  it.each([
+    [{ access_token: 'aaa.bbb.ccc', expires_in: 1800 }, 'missing token_type'],
+    [{ access_token: 'aaa.bbb.ccc', token_type: 'Bearer', expires_in: 1800 }, 'non-contract token_type'],
+    [{ access_token: 'aaa.bbb.ccc', token_type: 'bearer', expires_in: 1799 }, 'non-contract expires_in'],
+  ])('rejects a malformed successful login contract: %s (%s)', async (body, _case) => {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ accessToken: 'old.old.old', expiresAt: Date.now() + 60_000 }))
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(body), { status: 200 }))
+    renderLogin()
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Log out' }))
+    await user.type(screen.getByLabelText('Email'), 'person@example.com')
+    await user.type(screen.getByLabelText('Password'), 'password')
+    await user.click(screen.getByRole('button', { name: 'Sign in' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('We could not sign you in. Try again.')
+    expect(screen.getByLabelText('Password')).toHaveValue('')
     expect(localStorage.getItem(SESSION_KEY)).toBeNull()
   })
 
@@ -236,7 +268,7 @@ describe('/login', () => {
 
   it('reports storage_error when a successful session cannot be persisted', async () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('denied') })
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ access_token: 'aaa.bbb.ccc', expires_in: 60 }), { status: 200 }))
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ access_token: 'aaa.bbb.ccc', token_type: 'bearer', expires_in: 1800 }), { status: 200 }))
     renderLogin()
     const user = userEvent.setup()
     await user.type(screen.getByLabelText('Email'), 'person@example.com')
@@ -253,5 +285,75 @@ describe('/login', () => {
     renderLogin()
 
     expect(screen.getByRole('alert')).toHaveTextContent('Browser storage is unavailable. Enable it and try again.')
+  })
+
+  it('synchronizes logout received from another tab', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_000)
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 61_000 }))
+    renderLogin()
+
+    localStorage.removeItem(SESSION_KEY)
+    act(() => window.dispatchEvent(new StorageEvent('storage', { key: SESSION_KEY, newValue: null, storageArea: localStorage })))
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible()
+    expect(screen.queryByText('You are authenticated.')).not.toBeInTheDocument()
+  })
+
+  it('synchronizes a valid session received from another tab', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_000)
+    renderLogin()
+
+    const stored = JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 61_000 })
+    localStorage.setItem(SESSION_KEY, stored)
+    act(() => window.dispatchEvent(new StorageEvent('storage', { key: SESSION_KEY, newValue: stored, storageArea: localStorage })))
+
+    expect(screen.getByRole('status')).toHaveTextContent('You are authenticated.')
+  })
+
+  it('synchronizes an expired session received from another tab', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(10_000)
+    renderLogin()
+
+    const stored = JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 9_999 })
+    localStorage.setItem(SESSION_KEY, stored)
+    act(() => window.dispatchEvent(new StorageEvent('storage', { key: SESSION_KEY, newValue: stored, storageArea: localStorage })))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Your session has expired. Sign in again.')
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull()
+  })
+
+  it('detects expiration when a hidden tab becomes visible', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_000)
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 61_000 }))
+    renderLogin()
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 999 }))
+    vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+
+    act(() => document.dispatchEvent(new Event('visibilitychange')))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Your session has expired. Sign in again.')
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull()
+  })
+
+  it('removes storage and visibility listeners and the expiry timer when unmounted', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_000)
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 61_000 }))
+    const windowAdd = vi.spyOn(window, 'addEventListener')
+    const windowRemove = vi.spyOn(window, 'removeEventListener')
+    const documentAdd = vi.spyOn(document, 'addEventListener')
+    const documentRemove = vi.spyOn(document, 'removeEventListener')
+    const clearTimer = vi.spyOn(window, 'clearTimeout')
+
+    const view = renderLogin()
+    const storageListener = windowAdd.mock.calls.find(([event]) => event === 'storage')?.[1]
+    const visibilityListener = documentAdd.mock.calls.find(([event]) => event === 'visibilitychange')?.[1]
+    expect(storageListener).toBeTypeOf('function')
+    expect(visibilityListener).toBeTypeOf('function')
+
+    view.unmount()
+
+    expect(windowRemove).toHaveBeenCalledWith('storage', storageListener)
+    expect(documentRemove).toHaveBeenCalledWith('visibilitychange', visibilityListener)
+    expect(clearTimer).toHaveBeenCalled()
   })
 })

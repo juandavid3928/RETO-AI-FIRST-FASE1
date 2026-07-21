@@ -1,8 +1,14 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 
+import {
+  AuthSessionReadResult,
+  AUTH_SESSION_KEY,
+  clearAuthSession,
+  parseLoginResponse,
+  readAuthSession,
+  saveAuthSession,
+} from '../auth/authSession'
 import { loginAccount } from '../services/login'
-
-const SESSION_KEY = 'portal.auth.session'
 
 type LoginState =
   | 'idle'
@@ -19,51 +25,22 @@ type FieldErrors = Partial<Record<'email' | 'password', string>>
 type RestoredSession = { state: LoginState; message: string; expiresAt: number | null }
 
 const STORAGE_ERROR_MESSAGE = 'Browser storage is unavailable. Enable it and try again.'
+const EXPIRED_MESSAGE = 'Your session has expired. Sign in again.'
 
-function removeStoredSession(): boolean {
-  try {
-    localStorage.removeItem(SESSION_KEY)
-    return true
-  } catch {
-    return false
+function toRestoredSession(result: AuthSessionReadResult): RestoredSession {
+  if (result.kind === 'authenticated') {
+    return { state: 'authenticated', message: '', expiresAt: result.session.expiresAt }
   }
-}
-
-function hasJwtShape(token: unknown): token is string {
-  return typeof token === 'string' && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)
-}
-
-function restoreSession(): RestoredSession {
-  let stored: string | null
-  try {
-    stored = localStorage.getItem(SESSION_KEY)
-  } catch {
+  if (result.kind === 'expired') return { state: 'expired', message: EXPIRED_MESSAGE, expiresAt: null }
+  if (result.kind === 'storage_error') {
     return { state: 'storage_error', message: STORAGE_ERROR_MESSAGE, expiresAt: null }
   }
-  if (!stored) return { state: 'idle', message: '', expiresAt: null }
-  try {
-    const parsed = JSON.parse(stored) as { accessToken?: unknown; expiresAt?: unknown }
-    if (!hasJwtShape(parsed.accessToken) || typeof parsed.expiresAt !== 'number' || !Number.isFinite(parsed.expiresAt)) {
-      return removeStoredSession()
-        ? { state: 'idle', message: '', expiresAt: null }
-        : { state: 'storage_error', message: STORAGE_ERROR_MESSAGE, expiresAt: null }
-    }
-    if (parsed.expiresAt <= Date.now()) {
-      return removeStoredSession()
-        ? { state: 'expired', message: 'Your session has expired. Sign in again.', expiresAt: null }
-        : { state: 'storage_error', message: STORAGE_ERROR_MESSAGE, expiresAt: null }
-    }
-    return { state: 'authenticated', message: '', expiresAt: parsed.expiresAt }
-  } catch {
-    return removeStoredSession()
-      ? { state: 'idle', message: '', expiresAt: null }
-      : { state: 'storage_error', message: STORAGE_ERROR_MESSAGE, expiresAt: null }
-  }
+  return { state: 'idle', message: '', expiresAt: null }
 }
 
 export function LoginPage() {
   const restored = useRef<RestoredSession | null>(null)
-  if (restored.current === null) restored.current = restoreSession()
+  if (restored.current === null) restored.current = toRestoredSession(readAuthSession())
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [state, setState] = useState<LoginState>(restored.current.state)
@@ -74,14 +51,39 @@ export function LoginPage() {
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
 
+  const syncFromStorage = useCallback(() => {
+    const next = toRestoredSession(readAuthSession())
+    setExpiresAt(next.expiresAt)
+    setState(next.state)
+    setMessage(next.message)
+    setFieldErrors({})
+    if (next.state === 'authenticated') setEmail('')
+    setPassword('')
+  }, [])
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === AUTH_SESSION_KEY || event.key === null) syncFromStorage()
+    }
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') syncFromStorage()
+    }
+    window.addEventListener('storage', handleStorage)
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [syncFromStorage])
+
   useEffect(() => {
     if (state !== 'authenticated' || expiresAt === null) return
     const remaining = expiresAt - Date.now()
     const timer = window.setTimeout(() => {
       setExpiresAt(null)
-      if (removeStoredSession()) {
+      if (clearAuthSession()) {
         setState('expired')
-        setMessage('Your session has expired. Sign in again.')
+        setMessage(EXPIRED_MESSAGE)
       } else {
         setState('storage_error')
         setMessage(STORAGE_ERROR_MESSAGE)
@@ -92,13 +94,20 @@ export function LoginPage() {
 
   function logout() {
     setExpiresAt(null)
-    if (removeStoredSession()) {
+    if (clearAuthSession()) {
       setMessage('')
       setState('idle')
     } else {
       setMessage(STORAGE_ERROR_MESSAGE)
       setState('storage_error')
     }
+  }
+
+  function rejectMalformedLoginResponse() {
+    clearAuthSession()
+    setState('server')
+    setMessage('We could not sign you in. Try again.')
+    setPassword('')
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -126,19 +135,20 @@ export function LoginPage() {
     try {
       const response = await loginAccount({ email: trimmedEmail, password })
       if (response.status === 200) {
-        const body = await response.json() as { access_token?: unknown; expires_in?: unknown }
-        if (!hasJwtShape(body.access_token) || !Number.isInteger(body.expires_in) || (body.expires_in as number) <= 0) {
-          removeStoredSession()
-          setState('server')
-          setMessage('We could not sign you in. Try again.')
-          setPassword('')
+        let body: unknown
+        try {
+          body = await response.json()
+        } catch {
+          rejectMalformedLoginResponse()
           return
         }
-        const session = { accessToken: body.access_token, expiresAt: Date.now() + (body.expires_in as number) * 1000 }
-        try {
-          localStorage.setItem(SESSION_KEY, JSON.stringify(session))
-        } catch {
-          removeStoredSession()
+        const session = parseLoginResponse(body)
+        if (session === null) {
+          rejectMalformedLoginResponse()
+          return
+        }
+        if (!saveAuthSession(session)) {
+          clearAuthSession()
           setState('storage_error')
           setMessage('Your session could not be saved. Check browser storage and try again.')
           setPassword('')

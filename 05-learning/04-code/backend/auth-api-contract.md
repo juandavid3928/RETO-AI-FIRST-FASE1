@@ -121,10 +121,12 @@ HU-002 no agrega una ruta privada productiva. La dependencia se ejercita mediant
 ### Sesión frontend
 
 - `/login` permanece como destino después del éxito y muestra el estado autenticado.
+- El cliente acepta la respuesta `200` solo si contiene exactamente un JWT estructural, `token_type: "bearer"` y `expires_in: 1800`; cualquier contrato malformado limpia la sesión y produce un error genérico.
 - `localStorage` usa la clave `portal.auth.session` y guarda exclusivamente `{ "accessToken": "<JWT>", "expiresAt": 0 }`, donde `expiresAt` es epoch en milisegundos.
-- La sesión válida se restaura al recargar; una sesión corrupta o expirada se elimina.
+- La sesión válida se restaura al recargar y se sincroniza entre pestañas mediante `storage`; una sesión corrupta o expirada se elimina. Al recuperar visibilidad se reevalúa la expiración.
 - Logout es exclusivamente cliente: elimina almacenamiento, estado y temporizador. No revoca un token robado, que sigue válido hasta `exp`.
 - El riesgo XSS residual de `localStorage` se reduce mediante CSP estricta, ausencia de scripts de terceros y prohibición de registrar o incluir tokens en URLs.
+- `authenticatedFetch` no está implementado; se añadirá con la primera capacidad privada autorizada.
 
 ## Fuera de HU-002
 
