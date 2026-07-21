@@ -7,6 +7,13 @@ from app.application.errors import DatabaseUnavailable, DuplicateEmail
 from app.domain.user import User
 
 
+def _best_effort(operation: Callable[[], None]) -> None:
+    try:
+        operation()
+    except Exception:
+        pass
+
+
 class PostgresUserRepository:
     def __init__(
         self,
@@ -37,18 +44,18 @@ class PostgresUserRepository:
             return user
         except UniqueViolation as error:
             if connection is not None:
-                connection.rollback()
+                _best_effort(connection.rollback)
             if error.diag.constraint_name == "uq_users_email_canonical":
                 raise DuplicateEmail from None
             raise
         except psycopg.OperationalError:
             if connection is not None:
-                connection.rollback()
+                _best_effort(connection.rollback)
             raise DatabaseUnavailable from None
         except Exception:
             if connection is not None:
-                connection.rollback()
+                _best_effort(connection.rollback)
             raise
         finally:
             if connection is not None:
-                connection.close()
+                _best_effort(connection.close)

@@ -158,8 +158,8 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Arquitectura: `Email`, `UserId`, `User` y caso de uso hexagonal con puertos de repositorio, hash, reloj e ID; FastAPI, Pydantic, psycopg y pwdlib permanecen fuera de dominio/aplicación.
 - Persistencia: migración Alembic SQL reversible con UUID primary key, email canónico único, hash no nulo y `created_at`/`updated_at` con zona.
 - UI: única ruta `/register`, confirmación solo local, siete estados observables, doble envío bloqueado, permanencia en página y limpieza de campos sensibles al éxito.
-- Runtime: PostgreSQL 16, backend y frontend en Compose; migración al arrancar, healthchecks y dependencias saludables.
+- Runtime: PostgreSQL 16, backend y frontend en Compose; migración al arrancar, healthchecks, dependencias saludables y credenciales DB separadas que admiten caracteres reservados.
 - RED: fallos de importación/colección del backend, ausencia de Alembic, ausencia de Vitest/Playwright y Compose sin servicios fueron observados antes de GREEN; evidencia auxiliar en `/tmp/hu001-red-evidence.txt`.
-- Evidencia GREEN fresca: backend `28 passed`; frontend `8 passed`; build Vite exitoso; Playwright E2E `1 passed`; `npm audit` sin vulnerabilidades; `uv lock --check` y Compose válidos.
-- Seguridad: SQL parametrizado, Argon2id, errores sin detalles internos, límite real de 4 KiB y ausencia de password/hash/JWT en respuestas o almacenamiento frontend.
+- Evidencia GREEN fresca: backend `32 passed`; frontend `8 passed`; build Vite exitoso; Playwright E2E `1 passed`; `npm audit` sin vulnerabilidades; `uv lock --check` y Compose válidos.
+- Seguridad: SQL parametrizado, rollback/close de mejor esfuerzo sin ocultar indisponibilidad, Argon2id, errores sin detalles internos, límite real de 4 KiB y ausencia de password/hash/JWT en respuestas o almacenamiento frontend.
 - Estado: implementación pendiente de revisión mediante PR; no se hizo merge y HU-002 no fue iniciada.
