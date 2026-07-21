@@ -2,25 +2,33 @@
 
 ## Estado y convención
 
-Criterios propuestos para revisión antes de implementar. Cada escenario usa comportamiento observable; los detalles de payload, código HTTP y campos exactos se fijarán en el contrato aprobado de cada HU sin debilitar estos resultados.
+Los criterios de HU-001 están aprobados con el contrato de registro. Los criterios de HU-002 a HU-011 permanecen propuestos y no autorizan su implementación.
 
 ## HU-001 — Crear una cuenta
 
 ### AC-HU-001-01 — Registro exitoso
 
-**Dado** un visitante con datos válidos y un correo no registrado, **cuando** solicita crear la cuenta, **entonces** el sistema crea una única cuenta y confirma el resultado sin devolver la contraseña.
+**Dado** un visitante con `email` y `password` válidos y un correo no registrado, **cuando** envía `POST /api/v1/auth/register`, **entonces** recibe `201` con UUID4, correo canónico y fecha UTC de creación, sin JWT, contraseña ni hash.
 
 ### AC-HU-001-02 — Correo único
 
-**Dado** un correo ya asociado a una cuenta, incluso con diferencias normalizables de mayúsculas o espacios, **cuando** se intenta registrar de nuevo, **entonces** el sistema rechaza el conflicto y no crea otra cuenta.
+**Dado** un correo ya asociado a una cuenta, incluso con diferencias de mayúsculas o espacios exteriores, **cuando** se intenta registrar de nuevo, incluso concurrentemente, **entonces** PostgreSQL conserva una sola cuenta y la API responde `409` al duplicado mediante el sobre de error estable.
 
 ### AC-HU-001-03 — Datos inválidos
 
-**Dado** un registro con correo inválido o campos obligatorios ausentes, **cuando** se envía, **entonces** se rechaza con errores identificables por campo y no se persiste la cuenta.
+**Dado** JSON inválido, campos desconocidos o ausentes, email con sintaxis inválida, password fuera de 12..128 caracteres o cuerpo mayor de 4 KiB, **cuando** se envía, **entonces** se rechaza con `422`, sobre estable y errores identificables por campo cuando aplica, sin persistir una cuenta.
 
 ### AC-HU-001-04 — Protección de contraseña
 
-**Dado** un registro exitoso, **cuando** se inspeccionan la respuesta y la persistencia mediante una prueba autorizada, **entonces** la contraseña no aparece en la respuesta y no está almacenada en texto plano.
+**Dado** un registro exitoso, **cuando** se inspeccionan respuesta, logs y persistencia mediante una prueba autorizada, **entonces** la contraseña nunca aparece y la persistencia contiene únicamente un hash Argon2id generado mediante `pwdlib[argon2]`.
+
+### AC-HU-001-05 — Fallos controlados
+
+**Dado** que PostgreSQL no está disponible o ocurre un fallo inesperado, **cuando** se solicita el registro, **entonces** la API responde respectivamente `503` o `500` con el sobre estable, revierte la transacción y no expone detalles internos ni credenciales.
+
+### AC-HU-001-06 — Flujo web accesible
+
+**Dado** un visitante en `/register`, **cuando** completa email, password y confirmación, **entonces** la interfaz accesible distingue estados idle, invalid, submitting, success, conflict, network y server; impide doble envío, envía solo email/password, limpia campos sensibles al completar y permanece en la ruta sin usar storage, analytics ni logs de credenciales.
 
 ## HU-002 — Iniciar sesión
 

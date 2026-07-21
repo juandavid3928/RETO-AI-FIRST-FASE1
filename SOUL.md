@@ -65,7 +65,7 @@
 
 ## Evidencias de producto
 
-Sin pruebas funcionales, builds de aplicación ni flujos E2E: todavía no existe implementación productiva nueva.
+HU-001 es el primer incremento productivo nuevo. Las evidencias anteriores al 2026-07-21 siguen siendo históricas; la evidencia vigente está en el checkpoint final de este archivo.
 
 ## Checkpoint — 2026-07-16 — Pausa antes de completar la cobertura del backlog
 
@@ -150,3 +150,16 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Riesgos/Bloqueos: se retiró el bloqueo por ausencia de HU-010/HU-011; permanecen decisiones de contrato y la revisión humana normal del PR.
 - Producto funcional: inexistente; no se modificó `06-code/` ni se implementó ninguna HU.
 - Próximo paso: revisión de Codex sobre el PR #2; no hacer merge ni iniciar implementación en esta iteración.
+
+## Checkpoint — 2026-07-21 — HU-001 registro end-to-end
+
+- Alcance: exclusivamente creación de cuenta; HU-002 sigue pendiente y no se implementaron login, JWT, roles, verificación, recuperación ni perfil editable.
+- Decisiones: email recortado y canónico, password de 12..128 sin composición, UUID4, Argon2id, PostgreSQL como autoridad de concurrencia y errores HTTP estables.
+- Arquitectura: `Email`, `UserId`, `User` y caso de uso hexagonal con puertos de repositorio, hash, reloj e ID; FastAPI, Pydantic, psycopg y pwdlib permanecen fuera de dominio/aplicación.
+- Persistencia: migración Alembic SQL reversible con UUID primary key, email canónico único, hash no nulo y `created_at`/`updated_at` con zona.
+- UI: única ruta `/register`, confirmación solo local, siete estados observables, doble envío bloqueado, permanencia en página y limpieza de campos sensibles al éxito.
+- Runtime: PostgreSQL 16, backend y frontend en Compose; migración al arrancar, healthchecks y dependencias saludables.
+- RED: fallos de importación/colección del backend, ausencia de Alembic, ausencia de Vitest/Playwright y Compose sin servicios fueron observados antes de GREEN; evidencia auxiliar en `/tmp/hu001-red-evidence.txt`.
+- Evidencia GREEN fresca: backend `28 passed`; frontend `8 passed`; build Vite exitoso; Playwright E2E `1 passed`; `npm audit` sin vulnerabilidades; `uv lock --check` y Compose válidos.
+- Seguridad: SQL parametrizado, Argon2id, errores sin detalles internos, límite real de 4 KiB y ausencia de password/hash/JWT en respuestas o almacenamiento frontend.
+- Estado: implementación pendiente de revisión mediante PR; no se hizo merge y HU-002 no fue iniciada.

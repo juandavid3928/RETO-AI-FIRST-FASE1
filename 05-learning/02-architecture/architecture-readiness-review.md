@@ -1,20 +1,22 @@
 # Architecture readiness review
 
-Estado actual: estructura técnica base validada; arquitectura productiva pendiente de aprobación incremental por HU.
+Estado actual: arquitectura productiva de HU-001 implementada y validada; cualquier ampliación permanece sujeta a aprobación incremental.
 
-## Base estructural disponible
+## Incremento productivo disponible
 
 - Separación frontend/backend/DB.
-- Paquetes hexagonales backend completos y vacíos.
+- Dominio y aplicación hexagonales de HU-001 con puertos explícitos y sin imports de frameworks o infraestructura.
 - Dependencias backend y frontend bloqueadas mediante herramientas oficiales.
-- PostgreSQL 16 como único servicio inicial de Docker Compose.
+- PostgreSQL 16, backend FastAPI y frontend nginx como servicios Docker Compose con healthchecks.
 - Configuración sensible por entorno.
 - Integración SECOP reservada para un adaptador backend futuro.
-- Sin endpoints, entidades, tablas, pantallas ni lógica productiva.
+- Única capacidad productiva: registro en `POST /api/v1/auth/register` y pantalla `/register`; HU-002 a HU-011 permanecen sin implementación.
 
-## Pendiente antes de HU-001
+## Decisiones resueltas para HU-001
 
-- Aprobar contrato de registro.
-- Aprobar modelo mínimo de usuario.
-- Aprobar estrategia de pruebas del primer comportamiento.
-- Aprobar estrategia de persistencia e integridad para la HU.
+- Contrato de registro y modelo mínimo aprobados en `auth-api-contract.md`.
+- Dominio/aplicación aislados mediante puertos de repositorio, hash, reloj e ID.
+- PostgreSQL 16, psycopg runtime y Alembic SQL explícito adoptados para persistencia.
+- Estrategia TDD cubre unidad, aplicación, API, PostgreSQL real, migración, concurrencia, componentes, build, Compose y E2E.
+
+HU-002 no está iniciada.

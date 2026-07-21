@@ -2,7 +2,7 @@
 
 ## Estado
 
-Backlog funcional completo propuesto para revisión. Ninguna historia autoriza implementación: cada HU requiere aprobación de criterios, contrato y microplan.
+Backlog funcional completo. HU-001 fue aprobada e implementada como primer incremento; HU-002 a HU-011 no autorizan implementación y requieren aprobación de criterios, contrato y microplan.
 
 Prioridad:
 
@@ -35,8 +35,8 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Prioridad:** P0.
 - **Dependencias:** ninguna HU.
 - **Fuente:** OF-01, OF-02, OF-05.
-- **Estado:** conservada y refinada; pendiente de aprobación para implementación.
-- **Criterios:** AC-HU-001-01 a AC-HU-001-04 en `acceptance-criteria.md`.
+- **Estado:** implementada y validada end-to-end; pendiente de revisión y merge, sin iniciar HU-002.
+- **Criterios:** AC-HU-001-01 a AC-HU-001-06 en `acceptance-criteria.md`.
 
 ## HU-002 — Iniciar sesión
 

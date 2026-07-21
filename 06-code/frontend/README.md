@@ -1,5 +1,12 @@
-# Frontend
+# Frontend HU-001
 
-Dependencias base declaradas: React 18, React DOM 18, React Router DOM 6, Zustand, TypeScript, Vite y Tailwind CSS 4.
+React 18, TypeScript, Vite y Tailwind CSS 4. La única ruta funcional es `/register`, con email, password y confirmación accesibles y estados explícitos del flujo.
 
-No existe bootstrap, pantalla, ruta de producto, store ni servicio HTTP. El Dockerfile y nginx son únicamente estructura de despliegue futuro.
+```bash
+npm ci
+npm test
+npm run build
+npm run test:e2e
+```
+
+La confirmación nunca se envía al backend. El flujo no usa almacenamiento, analytics ni logging de credenciales.

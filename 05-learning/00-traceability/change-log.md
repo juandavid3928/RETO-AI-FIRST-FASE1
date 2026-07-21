@@ -106,3 +106,25 @@ Bitácora técnica iniciada después del onboarding y la aprobación de reconstr
 **Límites:** No se implementó código, no se aprobó el inicio de ninguna HU y no se hizo merge.
 
 **Pendiente:** Revisión de Codex y aprobación humana del PR #2.
+
+## 2026-07-21 — Implement HU-001 user registration
+
+**Tipo:** requisitos | backend | persistencia | frontend | pruebas | contenedores
+
+**Alcance:** se aprobó e implementó únicamente HU-001. HU-002 no fue iniciada.
+
+**Resultados:**
+- Contrato y seis criterios de HU-001 fijan payload, normalización, límites, respuestas y errores estables.
+- Caso de uso hexagonal con `Email`, `UserId`, `User` y puertos de repositorio, hash, reloj e ID; límites de imports verificados.
+- PostgreSQL 16 con migración Alembic SQL reversible, UUID4, hash Argon2id, `created_at`/`updated_at` con zona y unicidad canónica autoritativa.
+- FastAPI expone solo registro y health técnico; React expone `/register` con estados accesibles y protección de doble envío.
+- Compose incorpora DB, backend y frontend con healthchecks, orden por salud, locks y secretos suministrados por entorno.
+
+**Evidencia fresca:**
+- Backend: `uv run pytest -q` → 28 passed.
+- Frontend: `npm test` → 8 passed; `npm run build` → build exitoso.
+- PostgreSQL real: 4 pruebas de integración incluidas en backend, con migración up/down y carrera 201/409.
+- Browser E2E: `npm run test:e2e` → 1 passed, verificando browser→API→PostgreSQL y hash Argon2id.
+- Compose: build de ambos entrypoints y arranque saludable de los tres servicios; prueba de configuración exitosa.
+
+Los fallos RED observados antes de cada segmento quedaron fuera del repositorio en `/tmp/hu001-red-evidence.txt`.

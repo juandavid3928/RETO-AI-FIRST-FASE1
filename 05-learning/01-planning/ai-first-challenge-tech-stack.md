@@ -7,6 +7,7 @@
 - `uv` para resolución, lock y ejecución del entorno Python.
 - PostgreSQL mediante `psycopg`.
 - `pydantic-settings` para configuración.
+- `pwdlib[argon2]` para hashing Argon2id y Alembic para migraciones SQL explícitas.
 - pytest, pytest-asyncio y httpx para pruebas.
 
 ## Frontend
@@ -20,8 +21,7 @@
 ## Infraestructura
 
 - Docker Compose.
-- PostgreSQL 16 como único servicio inicial.
-- Backend y frontend no serán servicios Compose hasta disponer de entrypoints aprobados.
+- PostgreSQL 16, backend y frontend como servicios desde HU-001, con entrypoints aprobados y healthchecks.
 - Configuración mediante variables de entorno sin secretos versionados.
 
 ## Límites
@@ -29,4 +29,4 @@
 - Arquitectura hexagonal en backend.
 - Frontend consume exclusivamente backend.
 - Frontend no consume SECOP ni PostgreSQL directamente.
-- No existe funcionalidad productiva en la estructura base.
+- HU-001 es la única funcionalidad productiva; las demás historias permanecen pendientes.

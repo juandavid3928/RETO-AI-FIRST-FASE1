@@ -1,10 +1,17 @@
-# Estructura técnica base
+# HU-001 — Registro de usuarios
 
-Esqueleto limpio del Track DEV. Declara el stack y los límites arquitectónicos, pero no implementa HU-001, HU-002 ni HU-003.
+Incremento ejecutable del Portal de Convocatorias con registro de usuarios únicamente.
 
-- `backend/`: paquetes hexagonales vacíos y dependencias bloqueadas con `uv`.
-- `frontend/`: dependencias React/Vite declaradas, sin bootstrap ni UI funcional.
-- `db/`: directorios vacíos, sin SQL.
-- `docker-compose.yml`: PostgreSQL 16 como único servicio inicial.
+- `backend/`: FastAPI y caso de uso hexagonal; persistencia SQL mediante psycopg y migración Alembic explícita.
+- `frontend/`: React/Vite/Tailwind con la única ruta `/register`.
+- `docker-compose.yml`: PostgreSQL 16, backend y frontend con healthchecks y orden por salud.
 
-Backend y frontend no están incluidos como servicios Compose porque no existen entrypoints aprobados.
+Ejecución local:
+
+```bash
+POSTGRES_DB=portal POSTGRES_USER=portal POSTGRES_PASSWORD='<local-only>' docker compose up --build --wait
+```
+
+Abrir `http://localhost:8080/register`. Ningún secreto debe guardarse en archivos versionados.
+
+HU-002 y las capacidades de login/JWT permanecen fuera de alcance.
