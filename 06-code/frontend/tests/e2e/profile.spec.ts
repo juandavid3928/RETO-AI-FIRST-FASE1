@@ -31,8 +31,10 @@ test('own profile is private, exact, reloadable, and rejects a tampered token', 
   await page.evaluate(() => {
     const key = 'portal.auth.session'
     const session = JSON.parse(localStorage.getItem(key)!) as { accessToken: string; expiresAt: number }
-    const last = session.accessToken.at(-1)
-    session.accessToken = `${session.accessToken.slice(0, -1)}${last === 'a' ? 'b' : 'a'}`
+    const segments = session.accessToken.split('.')
+    const signature = segments[2]
+    segments[2] = `${signature[0] === 'a' ? 'b' : 'a'}${signature.slice(1)}`
+    session.accessToken = segments.join('.')
     localStorage.setItem(key, JSON.stringify(session))
   })
   await page.reload()
