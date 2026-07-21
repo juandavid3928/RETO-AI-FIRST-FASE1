@@ -8,7 +8,14 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_core import PydanticCustomError
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from app.application.errors import DatabaseUnavailable, DuplicateEmail, InvalidAccessToken, InvalidCredentials
+from app.application.errors import (
+    AuthenticatedUserNotFound,
+    DatabaseUnavailable,
+    DuplicateEmail,
+    InvalidAccessToken,
+    InvalidCredentials,
+)
+from app.application.use_cases.get_own_profile import OwnProfile
 from app.application.use_cases.validate_access_token import AuthenticatedPrincipal
 from app.domain.errors import InvalidEmail, InvalidPassword
 from app.domain.user import Email, User
@@ -68,21 +75,25 @@ class AuthBodyLimitMiddleware:
         await self._app(scope, replay_receive, send)
 
 
-class LoginNoStoreMiddleware:
+class PrivateNoStoreMiddleware:
     def __init__(self, app: ASGIApp) -> None:
         self._app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] != "http" or scope.get("path") != "/api/v1/auth/login":
+        path = scope.get("path")
+        if scope["type"] != "http" or path not in {"/api/v1/auth/login", "/api/v1/users/me"}:
             await self._app(scope, receive, send)
             return
 
         async def add_headers(message: Message) -> None:
             if message["type"] == "http.response.start":
-                message["headers"] = list(message.get("headers", [])) + [
+                private_headers = [
                     (b"cache-control", b"no-store"),
                     (b"pragma", b"no-cache"),
                 ]
+                if path == "/api/v1/users/me":
+                    private_headers.append((b"vary", b"Authorization"))
+                message["headers"] = list(message.get("headers", [])) + private_headers
             await send(message)
 
         await self._app(scope, receive, add_headers)
@@ -98,6 +109,10 @@ class AuthenticateUserPort(Protocol):
 
 class ValidateAccessTokenPort(Protocol):
     def execute(self, token: str) -> AuthenticatedPrincipal: ...
+
+
+class GetOwnProfilePort(Protocol):
+    def execute(self, principal: AuthenticatedPrincipal) -> OwnProfile: ...
 
 
 class RegistrationRequest(BaseModel):
@@ -149,10 +164,11 @@ def create_app(
     register_user: RegisterUserPort,
     authenticate_user: AuthenticateUserPort | None = None,
     validate_access_token: ValidateAccessTokenPort | None = None,
+    get_own_profile: GetOwnProfilePort | None = None,
 ) -> FastAPI:
     app = FastAPI(title="Portal de Convocatorias API")
     app.add_middleware(AuthBodyLimitMiddleware)
-    app.add_middleware(LoginNoStoreMiddleware)
+    app.add_middleware(PrivateNoStoreMiddleware)
     bearer = HTTPBearer(auto_error=False)
 
     def require_principal(
@@ -245,5 +261,29 @@ def create_app(
                 content={"error": {"code": "internal_error", "message": "An unexpected error occurred."}},
             )
         return {"access_token": token, "token_type": "bearer", "expires_in": 1800}
+
+    @app.get("/api/v1/users/me")
+    def own_profile(principal: AuthenticatedPrincipal = Depends(require_principal)) -> Any:
+        if get_own_profile is None:
+            raise RuntimeError("Own profile is not configured")
+        try:
+            profile = get_own_profile.execute(principal)
+        except AuthenticatedUserNotFound:
+            raise BearerFailure("invalid_token", "Access token is invalid.") from None
+        except DatabaseUnavailable:
+            return JSONResponse(
+                status_code=503,
+                content={"error": {"code": "database_unavailable", "message": "Profile is temporarily unavailable."}},
+            )
+        except Exception:
+            return JSONResponse(
+                status_code=500,
+                content={"error": {"code": "internal_error", "message": "An unexpected error occurred."}},
+            )
+        return {
+            "id": str(profile.id),
+            "email": profile.email,
+            "created_at": profile.created_at.isoformat().replace("+00:00", "Z"),
+        }
 
     return app

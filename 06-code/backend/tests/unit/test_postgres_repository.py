@@ -128,3 +128,35 @@ def test_get_by_email_returns_none_when_absent() -> None:
     connection = LookupConnectionStub(None)
     repository = PostgresUserRepository("unused", connect=cast(Any, lambda _: connection))
     assert repository.get_by_email("missing@example.com") is None
+
+
+def test_get_by_id_uses_primary_key_parameter_and_maps_user() -> None:
+    identifier = uuid4()
+    now = datetime.now(UTC)
+    connection = LookupConnectionStub((identifier, "person@example.com", "$argon2id$hash", now, now))
+    repository = PostgresUserRepository("unused", connect=cast(Any, lambda _: connection))
+
+    found = repository.get_by_id(UserId(identifier))
+
+    assert found == User(UserId(identifier), Email("person@example.com"), "$argon2id$hash", now, now)
+    assert connection.parameters == (identifier,)
+    assert "WHERE id = %s" in connection.query
+    assert connection.close_count == 1
+
+
+def test_get_by_id_returns_none_when_absent() -> None:
+    connection = LookupConnectionStub(None)
+    repository = PostgresUserRepository("unused", connect=cast(Any, lambda _: connection))
+
+    assert repository.get_by_id(UserId(uuid4())) is None
+    assert connection.close_count == 1
+
+
+def test_get_by_id_translates_unavailability_and_closes_safely() -> None:
+    connection = BrokenConnectionStub()
+    repository = PostgresUserRepository("unused", connect=cast(Any, lambda _: connection))
+
+    with pytest.raises(DatabaseUnavailable):
+        repository.get_by_id(UserId(uuid4()))
+
+    assert connection.close_count == 1

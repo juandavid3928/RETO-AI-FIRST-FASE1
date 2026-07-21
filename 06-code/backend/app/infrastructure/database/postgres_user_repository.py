@@ -80,3 +80,26 @@ class PostgresUserRepository:
         finally:
             if connection is not None:
                 _best_effort(connection.close)
+
+    def get_by_id(self, user_id: UserId) -> User | None:
+        connection: psycopg.Connection | None = None
+        try:
+            connection = self._connect(self._database_url)
+            row = connection.execute(
+                """
+                SELECT id, email, password_hash, created_at, updated_at
+                FROM users
+                WHERE id = %s
+                """,
+                (user_id.value,),
+            ).fetchone()
+            if row is None:
+                return None
+            return User(UserId(row[0]), Email(row[1]), row[2], row[3], row[4])
+        except psycopg.OperationalError:
+            if connection is not None:
+                _best_effort(connection.rollback)
+            raise DatabaseUnavailable from None
+        finally:
+            if connection is not None:
+                _best_effort(connection.close)

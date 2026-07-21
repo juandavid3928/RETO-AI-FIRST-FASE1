@@ -169,3 +169,34 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 **Evidencia RED:** la suite focalizada produjo 8 fallos reproducibles para contrato, multitab, visibilidad y cleanup; el test del módulo falló inicialmente porque el módulo todavía no existía. Una revisión posterior añadió 2 RED para JSON `200` inválido y campos extra en la sesión persistida.
 
 **Evidencia GREEN fresca:** frontend 41 passed y build Vite exitoso; backend completo contra PostgreSQL 16 real 76 passed; esquema restaurado con `alembic upgrade head` después de la prueba de downgrade; E2E conjunto registro/login 2 passed; audit 0, lock, Compose config, CSP/cabeceras, escaneo de secretos y `git diff --check` en verde. La infraestructura usó puertos efímeros libres y fue eliminada junto con volumen, red, temporales y artefactos Playwright.
+
+## 2026-07-21 — Implement HU-005 own profile
+
+**Tipo:** requisitos | backend | autorización | frontend | pruebas | documentación
+
+**Alcance:** primera capacidad privada completa sobre HU-001/HU-002. No se modificaron JWT, claims, tabla `users` ni migraciones; HU-003 y las demás historias no fueron iniciadas.
+
+**Resultados:**
+- `GET /api/v1/users/me` deriva la identidad únicamente de `AuthenticatedPrincipal.user_id`, proyecta exactamente `id`, `email`, `created_at` y aplica `no-store`, `no-cache` y `Vary: Authorization` en éxito y error.
+- `UserRepository.get_by_id` consulta el UUID parametrizado por primary key; `GetOwnProfile` no devuelve la entidad completa y un usuario eliminado se presenta como `401 invalid_token` sin enumeración.
+- La inyección de otro `user_id` por query, body o headers no cambia el principal ni permite exponer otra cuenta.
+- `AuthSessionProvider` centraliza restauración, expiración, `storage`, visibilidad y logout; `RequireAuth` solo controla UX.
+- `authenticatedFetch` restringe el destino a rutas relativas `/api/`, impide override de `Authorization`, clasifica errores y limpia sesión ante `401` sin navegar.
+- Login navega con `replace` a `/profile`; el perfil exacto se valida y mantiene solo en memoria, con estados loading, success, unauthorized, network, server y storage error.
+
+**Evidencia RED observada:**
+- Caso de uso: colección falló antes de existir `get_own_profile`; después quedó en 3 passed.
+- Repositorio: 3 fallos por ausencia de `get_by_id`; después quedó en 3 passed.
+- API: 5 fallos porque `create_app` no aceptaba el nuevo caso de uso; después quedaron verdes los contratos de perfil/login.
+- Frontend: la suite nueva produjo import ausente de `authenticatedFetch` y 8 fallos por ruta `/profile` inexistente; una regresión completa detectó 2 expectativas incompatibles con la navegación aprobada y la prioridad del mensaje de storage.
+- La primera validación E2E ejecutó 2 escenarios nuevos correctamente y detectó 1 fallo de harness por omitir `TEST_DATABASE_URL` al E2E heredado; el harness se corrigió y se repitió todo desde infraestructura nueva.
+
+**Evidencia GREEN reproducible:**
+- PostgreSQL 16 sobre volumen vacío, Compose completo y Alembic: servicios saludables; esquema final `20260721_0001 (head)`.
+- Backend completo contra PostgreSQL real: 89 passed; única advertencia no bloqueante de deprecación Starlette/TestClient.
+- Frontend unitario/componente: 58 passed; build TypeScript/Vite exitoso.
+- Playwright conjunto registro/login/perfil: 3 passed, incluido reload, logout, almacenamiento mínimo y token alterado.
+- `npm audit`: 0 vulnerabilidades; `uv lock --check`, Compose config, CSP, headers privados, frontera hexagonal, escaneo de secretos y `git diff --check`: PASS.
+- Puertos, credenciales y secreto JWT fueron efímeros; contenedores, red, volumen, env y artefactos Playwright se eliminaron mediante trap.
+
+**Estado:** implementación en `feat/hu-005-own-profile`, pendiente de revisión mediante PR y sin merge.

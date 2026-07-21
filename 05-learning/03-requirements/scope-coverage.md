@@ -2,14 +2,14 @@
 
 ## Estado
 
-Matriz vigente. HU-001 y HU-002 tienen implementación autorizada; el resto del backlog cubre el producto mínimo oficial sin autorizar código adicional.
+Matriz vigente. HU-001 y HU-002 están fusionadas; HU-005 tiene implementación autorizada en su rama. Ninguna otra HU está iniciada ni autorizada por esta actualización.
 
 ## Matriz requisito → historias
 
 | Requisito | Descripción resumida | Historias que lo cubren | Cobertura |
 |---|---|---|---|
 | OF-01 | Explorar, filtrar y guardar convocatorias como usuario registrado. | HU-001, HU-002, HU-003, HU-004, HU-006, HU-007. | Completa. |
-| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Registro y login/JWT implementados; perfil pendiente. |
+| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Incrementos implementados; HU-005 pendiente de revisión mediante PR. |
 | OF-03 | REST para búsqueda, filtros y bookmarks. | HU-003, HU-004, HU-006, HU-007, HU-010. | Completa a nivel funcional; HU-010 reutiliza el contrato mínimo de convocatoria. |
 | OF-04 | Web funcional para browse, favoritos y perfil. | HU-003, HU-004, HU-005, HU-006, HU-007, HU-010, HU-011. | Completa a nivel funcional; detalle y dashboard se limitan a AP-07. |
 | OF-05 | Persistencia de usuarios, bookmarks y búsquedas guardadas. | HU-001, HU-005, HU-006, HU-007, HU-008, HU-009. | Modelo físico de usuarios implementado; bookmarks y búsquedas pendientes. |
@@ -23,10 +23,10 @@ Matriz vigente. HU-001 y HU-002 tienen implementación autorizada; el resto del 
 | HU | Fuente principal | Dependencias | Prioridad | Estado |
 |---|---|---|---|---|
 | HU-001 | OF-01, OF-02, OF-05 | — | P0 | Implementada, validada y fusionada. |
-| HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Implementada y validada localmente; pendiente de publicación y revisión mediante PR. |
+| HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Implementada, validada y fusionada. |
 | HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Refinada; pendiente de aprobación. |
 | HU-004 | OF-01, OF-03, OF-06 | HU-003 | P0 | Agregada por división; pendiente. |
-| HU-005 | OF-02, OF-04 | HU-002 | P0 | Agregada; pendiente. |
+| HU-005 | OF-02, OF-04 | HU-002 | P0 | Implementada y validada en `feat/hu-005-own-profile`; pendiente de revisión mediante PR. |
 | HU-006 | OF-01, OF-03, OF-04, OF-05, OF-07 | HU-002, HU-003 | P0 | Agregada; pendiente. |
 | HU-007 | OF-01, OF-03, OF-04, OF-05, OF-07 | HU-006 | P0 | Agregada; pendiente. |
 | HU-008 | OF-05 | HU-004 | P0 | Agregada con inferencia explícita; pendiente. |
@@ -101,7 +101,7 @@ Orden recomendado: HU-001, HU-002, HU-005, HU-003, HU-004, HU-010, HU-006, HU-00
 ## Riesgos y decisiones pendientes
 
 - La fuente oficial ofrece un endpoint SECOP I como ejemplo, pero no fija el dataset definitivo.
-- La política de contraseña y los campos de registro de HU-001 están resueltos; faltan campos de perfil y política JWT para historias posteriores.
+- La política de contraseña, JWT y perfil mínimo están resueltas para HU-001, HU-002 y HU-005; cualquier ampliación requiere aprobación separada.
 - Faltan DTO, paginación, orden y semántica exacta de fecha/estado.
 - La política de nombre único para búsquedas guardadas es una inferencia y requiere ratificación.
 - El backlog propone browse y filtros privados a partir de “usuarios registrados”, pero debe ratificarse si habrá consulta pública.

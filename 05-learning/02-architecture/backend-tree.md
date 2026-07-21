@@ -19,7 +19,7 @@ backend/
 │   ├── application/
 │   │   ├── errors.py
 │   │   ├── ports/{access_token,clock,id_generator,password_hasher,password_verifier,user_repository}.py
-│   │   └── use_cases/{authenticate_user,register_user,validate_access_token}.py
+│   │   └── use_cases/{authenticate_user,get_own_profile,register_user,validate_access_token}.py
 │   ├── infrastructure/
 │   │   ├── database/postgres_user_repository.py
 │   │   ├── jwt_access_token.py
@@ -32,4 +32,4 @@ backend/
     └── integration/
 ```
 
-Los paquetes usan `__init__.py`. HU-001 y HU-002 son la lógica productiva vigente: dominio y aplicación no importan FastAPI, Pydantic, psycopg, pwdlib, PyJWT ni infraestructura. SECOP, HU-005 y las demás historias permanecen sin implementar.
+HU-001, HU-002 y HU-005 son la lógica productiva vigente en la rama de perfil. Dominio y aplicación no importan FastAPI, Pydantic, psycopg, pwdlib, PyJWT ni infraestructura. `GetOwnProfile` consume `AuthenticatedPrincipal`, consulta `UserRepository.get_by_id` y devuelve únicamente la proyección `OwnProfile`; no existe endpoint para consultar otro usuario. La migración original de `users` permanece sin cambios. SECOP y las demás historias no están implementadas.

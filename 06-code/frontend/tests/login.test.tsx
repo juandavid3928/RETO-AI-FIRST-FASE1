@@ -65,11 +65,17 @@ describe('/login', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('submits once, preserves the untrimmed 1-character password, stores the session, and stays authenticated on /login', async () => {
+  it('submits once, preserves the untrimmed 1-character password, stores the session, and replaces with /profile', async () => {
     vi.spyOn(Date, 'now').mockReturnValue(1_000)
     let resolveRequest: (response: Response) => void = () => undefined
     const request = new Promise<Response>((resolve) => { resolveRequest = resolve })
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockReturnValue(request)
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockReturnValueOnce(request)
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        id: '8bb45e10-84cb-4b89-8f75-c27bbb319fe8',
+        email: 'person@example.com',
+        created_at: '2026-07-21T15:00:00Z',
+      }), { status: 200 }))
     renderLogin()
     const user = userEvent.setup()
 
@@ -87,11 +93,11 @@ describe('/login', () => {
 
     resolveRequest(new Response(JSON.stringify({ access_token: 'aaa.bbb.ccc', token_type: 'bearer', expires_in: 1800 }), { status: 200 }))
 
-    expect(await screen.findByRole('status')).toHaveTextContent('You are authenticated.')
+    expect(await screen.findByRole('heading', { name: 'Your profile' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Log out' })).toBeEnabled()
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
     expect(localStorage.getItem(SESSION_KEY)).toBe(JSON.stringify({ accessToken: 'aaa.bbb.ccc', expiresAt: 1_801_000 }))
-    expect(window.location.pathname).toBe('/login')
+    expect(window.location.pathname).toBe('/profile')
   })
 
   it('trims only the email before validation and submission', async () => {

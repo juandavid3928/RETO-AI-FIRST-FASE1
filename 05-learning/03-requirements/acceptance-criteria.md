@@ -2,7 +2,7 @@
 
 ## Estado y convención
 
-Los criterios de HU-001 y HU-002 están aprobados con sus contratos de registro y login JWT. Los criterios de HU-003 a HU-011 permanecen propuestos y no autorizan su implementación.
+Los criterios de HU-001, HU-002 y HU-005 están aprobados. HU-005 se implementó y validó en su rama y permanece pendiente de revisión mediante PR; HU-003, HU-004 y HU-006 a HU-011 continúan propuestos y no autorizan implementación.
 
 ## HU-001 — Crear una cuenta
 
@@ -88,15 +88,15 @@ Los criterios de HU-001 y HU-002 están aprobados con sus contratos de registro 
 
 ### AC-HU-005-01 — Perfil autenticado
 
-**Dado** un usuario autenticado, **cuando** consulta su perfil, **entonces** recibe únicamente los campos de perfil aprobados para su propia cuenta.
+**Dado** un usuario autenticado, **cuando** consulta `GET /api/v1/users/me`, **entonces** recibe exactamente `id`, `email` y `created_at` de su propia cuenta.
 
 ### AC-HU-005-02 — Datos sensibles excluidos
 
-**Dado** cualquier perfil devuelto, **cuando** se inspecciona la respuesta, **entonces** no contiene contraseña, hash ni otros secretos de autenticación.
+**Dado** cualquier respuesta de perfil, **cuando** se inspeccionan payload, caché y almacenamiento cliente, **entonces** no contiene contraseña, hash, JWT ni claims, usa headers privados y el perfil no se persiste en `localStorage`.
 
 ### AC-HU-005-03 — Sin acceso cruzado
 
-**Dado** un usuario autenticado, **cuando** intenta manipular la solicitud para consultar otra cuenta, **entonces** el sistema deriva la identidad del JWT y no entrega el perfil ajeno.
+**Dado** un usuario autenticado, **cuando** intenta suministrar otro `user_id` por query, body o headers, **entonces** el sistema deriva la identidad de `AuthenticatedPrincipal.user_id` y no entrega el perfil ajeno; si el usuario del token ya no existe responde `401 invalid_token`.
 
 ## HU-006 — Guardar una convocatoria favorita
 

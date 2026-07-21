@@ -1,13 +1,8 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-import {
-  AuthSessionReadResult,
-  AUTH_SESSION_KEY,
-  clearAuthSession,
-  parseLoginResponse,
-  readAuthSession,
-  saveAuthSession,
-} from '../auth/authSession'
+import { useAuthSession } from '../auth/AuthSessionProvider'
+import { parseLoginResponse } from '../auth/authSession'
 import { loginAccount } from '../services/login'
 
 type LoginState =
@@ -22,79 +17,53 @@ type LoginState =
   | 'expired'
 type FieldErrors = Partial<Record<'email' | 'password', string>>
 
-type RestoredSession = { state: LoginState; message: string; expiresAt: number | null }
-
 const STORAGE_ERROR_MESSAGE = 'Browser storage is unavailable. Enable it and try again.'
 const EXPIRED_MESSAGE = 'Your session has expired. Sign in again.'
 
-function toRestoredSession(result: AuthSessionReadResult): RestoredSession {
-  if (result.kind === 'authenticated') {
-    return { state: 'authenticated', message: '', expiresAt: result.session.expiresAt }
-  }
-  if (result.kind === 'expired') return { state: 'expired', message: EXPIRED_MESSAGE, expiresAt: null }
-  if (result.kind === 'storage_error') {
-    return { state: 'storage_error', message: STORAGE_ERROR_MESSAGE, expiresAt: null }
-  }
-  return { state: 'idle', message: '', expiresAt: null }
+function initialState(status: ReturnType<typeof useAuthSession>['status']): { state: LoginState; message: string } {
+  if (status === 'authenticated') return { state: 'authenticated', message: '' }
+  if (status === 'expired') return { state: 'expired', message: EXPIRED_MESSAGE }
+  if (status === 'storage_error') return { state: 'storage_error', message: STORAGE_ERROR_MESSAGE }
+  return { state: 'idle', message: '' }
 }
 
 export function LoginPage() {
-  const restored = useRef<RestoredSession | null>(null)
-  if (restored.current === null) restored.current = toRestoredSession(readAuthSession())
+  const auth = useAuthSession()
+  const navigate = useNavigate()
+  const initial = useRef(initialState(auth.status))
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [state, setState] = useState<LoginState>(restored.current.state)
-  const [message, setMessage] = useState(restored.current.message)
-  const [expiresAt, setExpiresAt] = useState<number | null>(restored.current.expiresAt)
+  const [state, setState] = useState<LoginState>(initial.current.state)
+  const [message, setMessage] = useState(initial.current.message)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const requestInFlight = useRef(false)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
 
-  const syncFromStorage = useCallback(() => {
-    const next = toRestoredSession(readAuthSession())
-    setExpiresAt(next.expiresAt)
-    setState(next.state)
-    setMessage(next.message)
-    setFieldErrors({})
-    if (next.state === 'authenticated') setEmail('')
-    setPassword('')
-  }, [])
-
   useEffect(() => {
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === AUTH_SESSION_KEY || event.key === null) syncFromStorage()
+    if (auth.status === 'authenticated') {
+      setEmail('')
+      setPassword('')
+      setFieldErrors({})
+      setMessage('')
+      setState('authenticated')
+    } else if (auth.status === 'expired') {
+      setPassword('')
+      setMessage(EXPIRED_MESSAGE)
+      setState('expired')
+    } else if (auth.status === 'storage_error' && state !== 'storage_error') {
+      setPassword('')
+      setMessage(STORAGE_ERROR_MESSAGE)
+      setState('storage_error')
+    } else if (state === 'authenticated') {
+      setPassword('')
+      setMessage('')
+      setState('idle')
     }
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') syncFromStorage()
-    }
-    window.addEventListener('storage', handleStorage)
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => {
-      window.removeEventListener('storage', handleStorage)
-      document.removeEventListener('visibilitychange', handleVisibility)
-    }
-  }, [syncFromStorage])
-
-  useEffect(() => {
-    if (state !== 'authenticated' || expiresAt === null) return
-    const remaining = expiresAt - Date.now()
-    const timer = window.setTimeout(() => {
-      setExpiresAt(null)
-      if (clearAuthSession()) {
-        setState('expired')
-        setMessage(EXPIRED_MESSAGE)
-      } else {
-        setState('storage_error')
-        setMessage(STORAGE_ERROR_MESSAGE)
-      }
-    }, Math.max(0, remaining))
-    return () => window.clearTimeout(timer)
-  }, [state, expiresAt])
+  }, [auth.status, state])
 
   function logout() {
-    setExpiresAt(null)
-    if (clearAuthSession()) {
+    if (auth.clearSession()) {
       setMessage('')
       setState('idle')
     } else {
@@ -104,7 +73,7 @@ export function LoginPage() {
   }
 
   function rejectMalformedLoginResponse() {
-    clearAuthSession()
+    auth.clearSession()
     setState('server')
     setMessage('We could not sign you in. Try again.')
     setPassword('')
@@ -147,8 +116,7 @@ export function LoginPage() {
           rejectMalformedLoginResponse()
           return
         }
-        if (!saveAuthSession(session)) {
-          clearAuthSession()
+        if (!auth.establishSession(session)) {
           setState('storage_error')
           setMessage('Your session could not be saved. Check browser storage and try again.')
           setPassword('')
@@ -156,8 +124,7 @@ export function LoginPage() {
         }
         setEmail('')
         setPassword('')
-        setExpiresAt(session.expiresAt)
-        setState('authenticated')
+        navigate('/profile', { replace: true })
       } else if (response.status === 422) {
         let errors: FieldErrors = {}
         try {
