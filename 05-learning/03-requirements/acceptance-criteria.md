@@ -158,6 +158,46 @@ Criterios propuestos para revisión antes de implementar. Cada escenario usa com
 
 **Dada** una búsqueda guardada ajena, **cuando** otro usuario intenta consultarla, ejecutarla o eliminarla, **entonces** el sistema no entrega sus criterios ni la modifica.
 
+## HU-010 — Consultar detalle de convocatoria
+
+### AC-HU-010-01 — Apertura desde una convocatoria
+
+**Dado** un usuario autenticado y una convocatoria obtenida por HU-003, **cuando** solicita consultar su detalle, **entonces** el frontend usa su clave estable para consultar la API propia y el navegador no accede directamente a SECOP.
+
+### AC-HU-010-02 — Contenido mínimo trazable
+
+**Dada** una respuesta válida para la convocatoria seleccionada, **cuando** se muestra el detalle, **entonces** presenta únicamente los campos esenciales acordados del DTO —identidad, entidad, objeto o descripción breve, estado, fecha relevante y enlace a la fuente— sin inventar datos ausentes.
+
+### AC-HU-010-03 — Consistencia con la fuente
+
+**Dada** una convocatoria identificada por su clave estable, **cuando** el backend obtiene y normaliza su detalle, **entonces** la información corresponde a esa misma convocatoria y mantiene la semántica acordada para el browse.
+
+### AC-HU-010-04 — Estados controlados
+
+**Dada** una consulta de detalle, **cuando** está en curso, la convocatoria no existe o la integración falla, **entonces** la interfaz diferencia loading, not found y error sin presentar información de otra convocatoria ni capacidades ampliadas como edición, recomendaciones o analítica.
+
+## HU-011 — Visualizar dashboard resumen
+
+### AC-HU-011-01 — Resumen autenticado
+
+**Dado** un usuario autenticado, **cuando** abre el dashboard, **entonces** ve un resumen de convocatorias visibles en la consulta vigente, sus favoritos y sus búsquedas guardadas, obtenido mediante la API propia.
+
+### AC-HU-011-02 — Datos respaldados y consistentes
+
+**Dados** resultados de HU-003, favoritos de HU-007 y búsquedas de HU-009, **cuando** el dashboard presenta cantidades o accesos resumidos, **entonces** estos coinciden con las colecciones devueltas y no incorporan tendencias, puntajes, recomendaciones ni métricas externas.
+
+### AC-HU-011-03 — Acceso a capacidades existentes
+
+**Dado** un bloque del resumen con información disponible, **cuando** el usuario activa su acceso, **entonces** navega a la capacidad ya definida de exploración, favoritos o búsquedas guardadas sin crear un flujo funcional adicional.
+
+### AC-HU-011-04 — Vacío y fallo diferenciados
+
+**Dada** una colección vacía o una consulta fallida, **cuando** se construye el resumen, **entonces** el dashboard distingue ausencia real de datos y error, y no convierte un fallo en un valor cero aparentemente exitoso.
+
+### AC-HU-011-05 — Acceso privado
+
+**Dado** un visitante sin sesión válida, **cuando** intenta abrir el dashboard, **entonces** no recibe convocatorias ni resúmenes de favoritos o búsquedas guardadas de ningún usuario.
+
 ## Definition of Done documental para cada HU
 
 Antes de implementar una HU deben quedar aprobados sus criterios, contrato y microplan. Para cerrarla se exige evidencia real de RED → GREEN → REFACTOR, pruebas relevantes, revisión de seguridad y alcance, actualización trazable de documentación y ausencia de secretos. Las tareas técnicas no sustituyen estos resultados de negocio.

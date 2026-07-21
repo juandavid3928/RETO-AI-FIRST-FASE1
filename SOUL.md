@@ -22,7 +22,7 @@
 - Stack base aprobado: Python 3.12, FastAPI, Uvicorn, psycopg, pydantic-settings, PostgreSQL 16, React 18, React Router DOM 6, Zustand, TypeScript, Vite, Tailwind CSS 4 y Docker Compose.
 - Backend organizado mediante arquitectura hexagonal.
 - Docker Compose contiene únicamente PostgreSQL hasta disponer de entrypoints aprobados.
-- Backlog funcional propuesto para revisión: HU-001 a HU-009; no autoriza implementación.
+- Backlog funcional propuesto para revisión: HU-001 a HU-011; no autoriza implementación.
 - La estructura fue integrada mediante PR; todo cambio posterior mantiene prohibidos la integración local y el push directo a `main`.
 
 ## Checkpoint — 2026-07-16 — Reinicio aprobado del repositorio
@@ -57,9 +57,9 @@
 ## Checkpoint — 2026-07-16 — Refinamiento integral del backlog
 
 - Se contrastó el alcance inicial con el enunciado oficial Track DEV, la guía del programa y la documentación vigente.
-- Se separaron requisitos oficiales, decisiones aprobadas, nueve inferencias y dudas.
-- Backlog propuesto: nueve HU para registro, login, browse SECOP, filtros, perfil, favoritos y búsquedas guardadas.
-- Se definieron criterios observables, fuentes, valor, prioridad y dependencias sin ciclos.
+- Se separaron requisitos oficiales, decisiones aprobadas, once inferencias y dudas.
+- Backlog propuesto: once HU para registro, login, browse SECOP, filtros, perfil, favoritos, búsquedas guardadas, detalle mínimo y dashboard resumen.
+- Se definieron 43 criterios observables, fuentes, valor, prioridad y dependencias sin ciclos.
 - Las tareas técnicas permanecen separadas de las historias de usuario.
 - Estado: propuesta documental pendiente de revisión; no se creó código ni se inició HU-001.
 
@@ -82,7 +82,7 @@ Sin pruebas funcionales, builds de aplicación ni flujos E2E: todavía no existe
 - PR #2: abierto hacia `main`, no fusionado y destinado a revisión de Codex y aprobación humana.
 - Working tree: limpio antes de iniciar la edición de este checkpoint.
 - Diff funcional del PR #2 antes del checkpoint: siete documentos autorizados; `06-code/` sin cambios.
-- Backlog existente: 9 HU (`HU-001` a `HU-009`) y 34 criterios de aceptación únicos.
+- Backlog vigente: 11 HU (`HU-001` a `HU-011`) y 43 criterios de aceptación únicos.
 - No existe implementación productiva, prueba funcional, build de aplicación ni flujo E2E.
 - Ninguna HU ha comenzado; HU-001 tampoco está autorizada para implementación.
 
@@ -90,14 +90,16 @@ Sin pruebas funcionales, builds de aplicación ni flujos E2E: todavía no existe
 
 - Estructura técnica base creada sin comportamiento de producto y fusionada mediante PR #1.
 - Problema, actores, flujo, requisitos oficiales, decisiones, inferencias, dudas y límites documentados.
-- Nueve HU propuestas con valor, prioridad, dependencias, fuentes, estado y criterios observables.
+- Once HU propuestas con valor, prioridad, dependencias, fuentes, estado y criterios observables.
+- HU-010 cubre únicamente el detalle mínimo; HU-011 resume información ya respaldada sin analítica, recomendaciones ni métricas externas.
 - Matriz de trazabilidad y tareas técnicas separadas del backlog funcional.
 - Revisión independiente incorporada para marcar el acceso privado a browse/filtros como IN-09.
 
 ### Validaciones ya observadas
 
-- 9 HU y 34 criterios de aceptación únicos.
-- Requisitos obligatorios trazados en la matriz vigente.
+- 11 HU y 43 criterios de aceptación únicos.
+- HU-010 aporta 4 criterios y HU-011 aporta 5 criterios observables.
+- Requisitos obligatorios y la decisión AP-07 están trazados en las matrices vigentes.
 - Dependencias circulares: 0; duplicados detectados: 0.
 - Secretos o datos personales detectados en el diff documental: 0.
 - `git diff --check`: PASS antes de este checkpoint.
@@ -117,18 +119,34 @@ Sin pruebas funcionales, builds de aplicación ni flujos E2E: todavía no existe
 - Ratificar si browse/filtros serán privados o públicos.
 - Definir dataset, clave estable, DTO, fechas, estados, paginación y orden SECOP.
 - Resolver persistencia de bookmarks, búsquedas guardadas y políticas de resiliencia/calidad.
-- El backlog actual no contiene `HU-010` ni `HU-011`; por instrucción de pausa, todavía debe resolverse la cobertura funcional de detalle de convocatoria y dashboard.
-- No asumir que detalle y dashboard son requisitos oficiales: deben trazarse a fuente verificable o clasificarse explícitamente como inferencia/decisión antes de agregarlos, combinarlos o justificar su cobertura en HU existentes.
-- No fusionar el PR #2 hasta completar esa cobertura, repetir las validaciones y obtener revisión de Codex y aprobación humana.
-- No iniciar HU-001 ni modificar `06-code/` durante esta pausa.
+- La cobertura de detalle y dashboard quedó resuelta por AP-07, HU-010, HU-011, IN-10 e IN-11; ya no bloquea el PR #2 por ausencia funcional.
+- La clasificación se mantiene explícita: AP-07 es la instrucción aprobada; las referencias visuales no son requisitos oficiales.
+- El PR #2 queda pendiente de revisión de Codex y aprobación humana, no de nuevas HU.
+- No iniciar HU-001 ni modificar `06-code/` sin la aprobación posterior correspondiente.
 
 ### Riesgos e inconsistencias conocidas
 
-- El PR #2 presenta el backlog de nueve HU como completo, pero la instrucción de pausa introduce una revisión pendiente sobre detalle y dashboard; esa inconsistencia debe resolverse antes del merge.
-- Las referencias visuales incluyen dashboard y detalle, pero por sí solas no tienen autoridad de requisito oficial.
+- La inconsistencia de cobertura del PR #2 quedó resuelta con once HU; debe evitarse que la descripción remota conserve conteos o bloqueos anteriores.
+- Las referencias visuales incluyen dashboard y detalle, pero por sí solas no tienen autoridad de requisito oficial; AP-07 acota ambas capacidades.
 - Búsquedas guardadas son obligatorias en persistencia, aunque su flujo funcional oficial está menos especificado.
 - Permanecen abiertos contratos, umbrales no funcionales y semántica de integración SECOP.
 
 ### Siguiente acción exacta al reanudar
 
-Revisar el diff y comentarios del PR #2; contrastar detalle de convocatoria y dashboard con las fuentes oficiales y referencias visuales; decidir si corresponden a `HU-010`/`HU-011`, a una división/combinación de HU existentes o a fuera de alcance; actualizar backlog, criterios y trazabilidad; repetir los gates documentales; solicitar revisión de Codex y aprobación humana. No fusionar ni implementar antes de esa decisión.
+Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios; aprobar o solicitar ajustes. No fusionar ni implementar durante esta iteración.
+
+## Checkpoint — 2026-07-21 — Cobertura funcional completa del backlog
+
+- Avance verificado: se conservaron HU-001 a HU-009 y se incorporaron HU-010 — Consultar detalle de convocatoria y HU-011 — Visualizar dashboard resumen.
+- Alcance: únicamente `05-learning/03-requirements/`, `05-learning/00-traceability/change-log.md` y `SOUL.md`.
+- Evidencia documental:
+  - 11 HU únicas y numeradas de HU-001 a HU-011.
+  - 43 criterios únicos: 4 nuevos para HU-010 y 5 nuevos para HU-011.
+  - Grafo de dependencias dirigido sin ciclos.
+  - Matrices requisito→HU y HU→fuente/dependencia actualizadas.
+  - `git diff --check`: PASS.
+  - Verificación documental ad hoc y revisión de rutas/secretos: PASS.
+- Decisión: AP-07 registra la instrucción aprobada; HU-010 queda limitada al detalle mínimo y HU-011 al resumen de convocatorias visibles, favoritos y búsquedas guardadas, sin analítica, recomendaciones ni métricas externas.
+- Riesgos/Bloqueos: se retiró el bloqueo por ausencia de HU-010/HU-011; permanecen decisiones de contrato y la revisión humana normal del PR.
+- Producto funcional: inexistente; no se modificó `06-code/` ni se implementó ninguna HU.
+- Próximo paso: revisión de Codex sobre el PR #2; no hacer merge ni iniciar implementación en esta iteración.

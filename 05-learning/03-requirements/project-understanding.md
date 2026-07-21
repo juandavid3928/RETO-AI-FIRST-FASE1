@@ -35,9 +35,11 @@ Contratistas y proveedores necesitan identificar oportunidades de contratación 
 3. Puede consultar su perfil propio.
 4. Explora convocatorias obtenidas en vivo desde SECOP por medio del backend.
 5. Aplica filtros por entidad, rango de fechas y estado, de forma individual o combinada.
-6. Guarda una convocatoria como favorita y luego puede consultarla o retirarla.
-7. Guarda un conjunto útil de filtros y posteriormente puede consultarlo, ejecutarlo de nuevo o eliminarlo.
-8. El portal informa estados de carga, resultados, ausencia de resultados y error sin exponer detalles internos.
+6. Consulta el detalle mínimo de una convocatoria seleccionada.
+7. Guarda una convocatoria como favorita y luego puede consultarla o retirarla.
+8. Guarda un conjunto útil de filtros y posteriormente puede consultarlo, ejecutarlo de nuevo o eliminarlo.
+9. Visualiza un dashboard que resume convocatorias visibles, favoritos y búsquedas guardadas ya respaldadas.
+10. El portal informa estados de carga, resultados, ausencia de resultados y error sin exponer detalles internos.
 
 ## Catálogo de requisitos oficiales
 
@@ -63,6 +65,7 @@ Contratistas y proveedores necesitan identificar oportunidades de contratación 
 | AP-04 | La integración externa se normaliza detrás de un adaptador y debe distinguir timeout, error HTTP, payload inválido y respuesta vacía. |
 | AP-05 | Cada HU requiere contrato y microplan aprobados antes de implementar, seguido de RED → GREEN → REFACTOR. |
 | AP-06 | No existe todavía producto funcional; este backlog es documental y permanece pendiente de revisión. |
+| AP-07 | La instrucción de reanudación del 2026-07-21 aprueba incorporar HU-010 para detalle mínimo y HU-011 para dashboard resumen, sin capacidades ampliadas, analítica, recomendaciones ni métricas externas. |
 
 ## Inferencias explícitas usadas por el backlog
 
@@ -77,6 +80,8 @@ Contratistas y proveedores necesitan identificar oportunidades de contratación 
 | IN-07 | La identidad de la convocatoria proviene de una clave estable del dataset acordado. | Favoritos persistentes requieren volver a identificar la oportunidad externa. |
 | IN-08 | El filtro oficial por fecha se modela como un rango inclusivo con inicio y fin. | Un rango ofrece un criterio útil y verificable para convocatorias; el enunciado no fija todavía su semántica exacta. |
 | IN-09 | Explorar y filtrar convocatorias requiere una sesión autenticada. | El enunciado atribuye estas capacidades a “usuarios registrados”, pero no prohíbe expresamente un browse público. |
+| IN-10 | El detalle mínimo reutiliza la clave estable y el DTO acordados para browse, y muestra identidad, entidad, objeto o descripción breve, estado, fecha relevante y enlace a la fuente. | Hace observable la decisión AP-07 sin convertir referencias visuales en autoridad ni agregar enriquecimiento no confirmado. |
+| IN-11 | El dashboard resume únicamente la consulta vigente y las colecciones propias de favoritos y búsquedas guardadas. | Hace observable AP-07 con información ya respaldada por HU-003, HU-007 y HU-009; excluye analítica y métricas externas. |
 
 Estas inferencias deben ser ratificadas o sustituidas durante la revisión del backlog; no se presentan como texto oficial.
 
@@ -103,6 +108,8 @@ Estas inferencias deben ser ratificadas o sustituidas durante la revisión del b
 9. Un usuario no tiene dos favoritos para la misma convocatoria.
 10. Una búsqueda guardada posee un nombre único por usuario y al menos un criterio soportado.
 11. Reejecutar una búsqueda guardada usa sus criterios y consulta información vigente.
+12. El detalle mínimo reutiliza la clave estable y no enriquece la convocatoria con capacidades o datos no confirmados.
+13. El dashboard solo resume convocatorias visibles, favoritos y búsquedas guardadas; no calcula analítica, recomendaciones ni métricas externas.
 
 ## Límites del alcance
 
@@ -111,6 +118,8 @@ Estas inferencias deben ser ratificadas o sustituidas durante la revisión del b
 - Registro, login JWT y consulta de perfil propio.
 - Browse en vivo de convocatorias SECOP.
 - Filtros por entidad, fecha y estado.
+- Detalle mínimo de una convocatoria seleccionada.
+- Dashboard resumen de convocatorias visibles, favoritos y búsquedas guardadas.
 - Guardar, listar y retirar favoritos persistentes.
 - Guardar, listar, reejecutar y eliminar búsquedas guardadas.
 - Estados web observables de carga, resultados, vacío y error.
@@ -123,8 +132,8 @@ Estas inferencias deben ser ratificadas o sustituidas durante la revisión del b
 - Notificaciones, alertas o ejecución programada de búsquedas.
 - Recuperación de contraseña, verificación de correo, MFA y proveedores sociales.
 - Edición avanzada del perfil.
-- Recomendaciones, analítica, pagos, mensajería o colaboración.
-- Detalle ampliado como flujo independiente; el browse debe mostrar información suficiente y un enlace a la fuente.
+- Recomendaciones, analítica, métricas externas, pagos, mensajería o colaboración.
+- Detalle ampliado con documentos, cronologías, enriquecimiento, acciones de edición o capacidades distintas del contenido mínimo aprobado en HU-010.
 - Caché funcional, operación offline o réplica completa de SECOP.
 - Soporte simultáneo para múltiples datasets SECOP.
 
@@ -138,6 +147,7 @@ Estas inferencias deben ser ratificadas o sustituidas durante la revisión del b
 6. Datos mínimos conservados junto al bookmark y estrategia ante oportunidades retiradas de la fuente.
 7. Longitud del nombre de búsqueda guardada y política para renombrar o actualizar criterios.
 8. Política de caché, rate limits, reintentos y timeouts.
-9. Enlace o campos mínimos para consultar la fuente original sin crear una HU de detalle ampliado.
-10. Ratificar si browse y filtros serán privados como propone IN-09 o también estarán disponibles sin sesión.
-11. Definir objetivos medibles de accesibilidad, rendimiento y logging sin datos sensibles.
+9. Ratificar los nombres y mapeos exactos de los campos mínimos de HU-010 dentro del DTO aprobado.
+10. Definir si el resumen de convocatorias de HU-011 usa la página vigente o una consulta predeterminada y cómo comunica sus límites.
+11. Ratificar si browse y filtros serán privados como propone IN-09 o también estarán disponibles sin sesión.
+12. Definir objetivos medibles de accesibilidad, rendimiento y logging sin datos sensibles.

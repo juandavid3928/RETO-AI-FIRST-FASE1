@@ -6,10 +6,10 @@ Backlog funcional completo propuesto para revisión. Ninguna historia autoriza i
 
 Prioridad:
 
-- **P0:** necesaria para cubrir el producto mínimo oficial.
+- **P0:** necesaria para cubrir el producto mínimo aprobado.
 - **P1:** valiosa pero no necesaria para el mínimo.
 
-Todas las historias de este backlog son P0 porque trazan a un requisito oficial. Las decisiones técnicas se mantienen fuera de las HU.
+Todas las historias de este backlog son P0: HU-001 a HU-009 trazan al mínimo oficial y HU-010/HU-011 resuelven la cobertura funcional mínima aprobada por la instrucción de reanudación. Las decisiones técnicas se mantienen fuera de las HU.
 
 ## Orden de implementación propuesto
 
@@ -18,10 +18,12 @@ Todas las historias de este backlog son P0 porque trazan a un requisito oficial.
 3. HU-005 — Consultar el perfil propio.
 4. HU-003 — Explorar convocatorias vigentes.
 5. HU-004 — Filtrar convocatorias.
-6. HU-006 — Guardar una convocatoria favorita.
-7. HU-007 — Gestionar favoritos.
-8. HU-008 — Guardar criterios de búsqueda.
-9. HU-009 — Gestionar búsquedas guardadas.
+6. HU-010 — Consultar detalle de convocatoria.
+7. HU-006 — Guardar una convocatoria favorita.
+8. HU-007 — Gestionar favoritos.
+9. HU-008 — Guardar criterios de búsqueda.
+10. HU-009 — Gestionar búsquedas guardadas.
+11. HU-011 — Visualizar dashboard resumen.
 
 El orden respeta dependencias y entrega valor incremental sin ciclos.
 
@@ -124,16 +126,38 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Estado:** agregada y separada de la creación para mantener un incremento manejable; pendiente de aprobación para implementación.
 - **Criterios:** AC-HU-009-01 a AC-HU-009-04.
 
+## HU-010 — Consultar detalle de convocatoria
+
+**Historia:** Como usuario autenticado, quiero consultar el detalle mínimo de una convocatoria seleccionada para comprender sus datos esenciales y decidir si deseo conservarla como favorita.
+
+- **Valor de negocio:** reduce la incertidumbre antes de guardar una oportunidad sin ampliar el portal con capacidades no confirmadas.
+- **Prioridad:** P0.
+- **Dependencias:** HU-003.
+- **Fuente:** AP-07; OF-03, OF-04 como respaldo del browse; IN-07, IN-10. La referencia visual solo orienta presentación y no amplía el alcance funcional.
+- **Estado:** agregada por instrucción aprobada para completar la cobertura mínima; pendiente de aprobación para implementación.
+- **Criterios:** AC-HU-010-01 a AC-HU-010-04.
+
+## HU-011 — Visualizar dashboard resumen
+
+**Historia:** Como usuario autenticado, quiero visualizar un dashboard con el resumen de mis convocatorias visibles, favoritos y búsquedas guardadas para retomar rápidamente las capacidades ya disponibles en el portal.
+
+- **Valor de negocio:** concentra el acceso a información ya respaldada por el backlog sin introducir analítica, recomendaciones ni métricas externas.
+- **Prioridad:** P0.
+- **Dependencias:** HU-003, HU-007, HU-009.
+- **Fuente:** AP-07; OF-04 como respaldo de la interfaz web; IN-01, IN-11. La referencia visual solo orienta presentación y no autoriza nuevas métricas.
+- **Estado:** agregada por instrucción aprobada para completar la cobertura mínima; pendiente de aprobación para implementación.
+- **Criterios:** AC-HU-011-01 a AC-HU-011-05.
+
 ## Tareas técnicas — no son historias de usuario
 
 | ID | Tarea habilitadora | HUs relacionadas |
 |---|---|---|
-| TT-01 | Definir contratos HTTP, errores y DTO por incremento. | HU-001 a HU-009. |
+| TT-01 | Definir contratos HTTP, errores y DTO por incremento. | HU-001 a HU-011. |
 | TT-02 | Diseñar y versionar persistencia para usuarios, bookmarks y búsquedas guardadas. | HU-001, HU-005 a HU-009. |
-| TT-03 | Implementar seguridad de credenciales, JWT, autenticación y aislamiento por propietario. | HU-001, HU-002, HU-005 a HU-009. |
-| TT-04 | Construir el puerto/adaptador SECOP, normalización, límites y manejo de fallos. | HU-003, HU-004, HU-009. |
-| TT-05 | Crear shell web, navegación y estados loading/empty/error/success. | HU-001 a HU-009 según cada slice. |
-| TT-06 | Añadir pruebas unitarias, integración, contrato y E2E trazadas a los AC. | HU-001 a HU-009. |
+| TT-03 | Implementar seguridad de credenciales, JWT, autenticación y aislamiento por propietario. | HU-001, HU-002, HU-005 a HU-011. |
+| TT-04 | Construir el puerto/adaptador SECOP, normalización, límites y manejo de fallos. | HU-003, HU-004, HU-009, HU-010, HU-011. |
+| TT-05 | Crear shell web, navegación y estados loading/empty/error/success. | HU-001 a HU-011 según cada slice. |
+| TT-06 | Añadir pruebas unitarias, integración, contrato y E2E trazadas a los AC. | HU-001 a HU-011. |
 | TT-07 | Incorporar entrypoints, Compose completo y ejecución reproducible cuando existan aplicaciones. | Entrega técnica OF-08. |
 | TT-08 | Mantener README, SOUL, changelog y evidencia de demo. | Entrega OF-09. |
 

@@ -5,7 +5,7 @@ Backlog funcional completo propuesto para revisión. No autoriza implementación
 ## Documentos
 
 - `project-understanding.md`: problema, actores, flujo, fuentes, reglas, límites, inferencias y decisiones pendientes.
-- `user-stories.md`: nueve HU priorizadas, dependencias, valor, fuentes y tareas técnicas separadas.
+- `user-stories.md`: once HU priorizadas, dependencias, valor, fuentes y tareas técnicas separadas.
 - `acceptance-criteria.md`: criterios observables por HU en formato Dado/Cuando/Entonces.
 - `scope-coverage.md`: matrices de trazabilidad, grafo de dependencias y evaluación del backlog anterior.
 
@@ -32,5 +32,7 @@ Una HU no pasa a código hasta que Codex y el humano aprueben sus criterios, con
 - HU-007: gestionar favoritos.
 - HU-008: guardar criterios de búsqueda.
 - HU-009: gestionar búsquedas guardadas.
+- HU-010: consultar detalle de convocatoria.
+- HU-011: visualizar dashboard resumen.
 
 Estado de todas: pendientes de aprobación para implementación.

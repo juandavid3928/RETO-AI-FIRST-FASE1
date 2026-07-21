@@ -83,3 +83,26 @@ Bitácora técnica iniciada después del onboarding y la aprobación de reconstr
 **Límites:** No se modificó `06-code/`, no se implementó ninguna HU y el backlog permanece pendiente de revisión y aprobación.
 
 **Pendiente:** Resolver las decisiones abiertas y aprobar criterios, contrato y microplan de HU-001 antes de crear código.
+
+## 2026-07-21 — Complete backlog functional coverage
+
+**Tipo:** requisitos | trazabilidad | documentación
+
+**Motivo:** Resolver el único bloqueo funcional del PR #2 mediante cobertura explícita de detalle de convocatoria y dashboard resumen.
+
+**Acciones:**
+- Se conservaron HU-001 a HU-009.
+- Se agregaron HU-010 para el detalle mínimo y HU-011 para un dashboard limitado a información ya respaldada.
+- AP-07 registra la instrucción aprobada; IN-10 e IN-11 documentan las decisiones observables sin elevar referencias visuales a requisito oficial.
+- Se añadieron 9 criterios Dado/Cuando/Entonces y se actualizaron orden, grafo, matrices, conteos, riesgos y decisiones pendientes.
+- Se retiró del checkpoint el bloqueo por ausencia de HU-010/HU-011.
+
+**Validaciones observadas:**
+- Verificación documental ad hoc: 11 HU, 43 criterios únicos, fuentes y campos completos, matrices consistentes y 0 ciclos.
+- Alcance Git: solo 7 documentos dentro de las rutas autorizadas; `06-code/` y archivos protegidos sin cambios.
+- Búsqueda enfocada de secretos y datos heredados en el diff: 0 coincidencias.
+- `git diff --check`: PASS.
+
+**Límites:** No se implementó código, no se aprobó el inicio de ninguna HU y no se hizo merge.
+
+**Pendiente:** Revisión de Codex y aprobación humana del PR #2.
