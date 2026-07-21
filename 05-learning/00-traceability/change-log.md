@@ -48,3 +48,61 @@ Bitácora técnica iniciada después del onboarding y la aprobación de reconstr
 **Límites:** No se crearon endpoints, entidades, casos de uso, tablas, SQL, pantallas, rutas de producto, stores, autenticación ni integración SECOP.
 
 **Pendiente:** Aprobar contrato y microplan de HU-001 antes de implementar comportamiento.
+
+## 2026-07-16 — Refine complete product backlog
+
+**Tipo:** requisitos | trazabilidad | documentación
+
+**Motivo:** Contrastar las tres historias iniciales con el alcance funcional completo del Track DEV y preparar un backlog verificable para revisión.
+
+**Fuentes inspeccionadas:**
+- Enunciado oficial Track DEV y guía oficial del programa.
+- `README.md`, `CLAUDE.md`, workshops de Spec Engineering y documentación vigente de `05-learning/`.
+- El documento Track QA se clasificó como fuera de autoridad para el producto DEV.
+
+**Acciones:**
+- Se separaron requisitos oficiales, decisiones aprobadas, inferencias y dudas.
+- Se definieron problema, actores, flujo principal, reglas y límites.
+- Se conservaron y refinaron HU-001 y HU-002.
+- Se refinó HU-003 y se dividió el alcance de búsqueda con HU-004.
+- Se agregaron HU-005 a HU-009 para cubrir perfil, favoritos y búsquedas guardadas.
+- Se documentaron criterios observables, dependencias sin ciclos, prioridad P0 y matriz de trazabilidad.
+- Se separaron ocho tareas técnicas habilitadoras de las historias de usuario.
+
+**Validaciones observadas:**
+- Verificación documental ad hoc inicial: 7 rutas autorizadas, 9 HU, 34 criterios, 9 requisitos oficiales, 8 inferencias y 8 tareas técnicas; 0 ciclos y 0 fallos.
+- `git diff --check`: PASS.
+- El primer intento del verificador produjo falsos negativos al no aceptar las flexiones «Dada/Dados»; se corrigió únicamente el harness temporal y se repitió con resultado PASS.
+- Una revisión independiente posterior confirmó la cobertura y detectó que el acceso privado a browse/filtros debía marcarse como IN-09; también separó las restricciones AI-First de las HU.
+
+**Áreas afectadas:**
+- `05-learning/03-requirements/`
+- `05-learning/00-traceability/change-log.md`
+- `SOUL.md`
+
+**Límites:** No se modificó `06-code/`, no se implementó ninguna HU y el backlog permanece pendiente de revisión y aprobación.
+
+**Pendiente:** Resolver las decisiones abiertas y aprobar criterios, contrato y microplan de HU-001 antes de crear código.
+
+## 2026-07-21 — Complete backlog functional coverage
+
+**Tipo:** requisitos | trazabilidad | documentación
+
+**Motivo:** Resolver el único bloqueo funcional del PR #2 mediante cobertura explícita de detalle de convocatoria y dashboard resumen.
+
+**Acciones:**
+- Se conservaron HU-001 a HU-009.
+- Se agregaron HU-010 para el detalle mínimo y HU-011 para un dashboard limitado a información ya respaldada.
+- AP-07 registra la instrucción aprobada; IN-10 e IN-11 documentan las decisiones observables sin elevar referencias visuales a requisito oficial.
+- Se añadieron 9 criterios Dado/Cuando/Entonces y se actualizaron orden, grafo, matrices, conteos, riesgos y decisiones pendientes.
+- Se retiró del checkpoint el bloqueo por ausencia de HU-010/HU-011.
+
+**Validaciones observadas:**
+- Verificación documental ad hoc: 11 HU, 43 criterios únicos, fuentes y campos completos, matrices consistentes y 0 ciclos.
+- Alcance Git: solo 7 documentos dentro de las rutas autorizadas; `06-code/` y archivos protegidos sin cambios.
+- Búsqueda enfocada de secretos y datos heredados en el diff: 0 coincidencias.
+- `git diff --check`: PASS.
+
+**Límites:** No se implementó código, no se aprobó el inicio de ninguna HU y no se hizo merge.
+
+**Pendiente:** Revisión de Codex y aprobación humana del PR #2.
