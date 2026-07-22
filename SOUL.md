@@ -201,4 +201,5 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Seguridad/calidad: aislamiento adversarial, token alterado, usuario eliminado, respuesta exacta, no-store/no-cache/Vary, CSP, audit 0, lock, Compose config, frontera hexagonal, secretos y `git diff --check` en verde.
 - Limpieza: credenciales/JWT y puertos efímeros; trap eliminó contenedores, red, volumen, env y artefactos Playwright.
 - Riesgos: `localStorage` conserva riesgo XSS residual, logout no revoca JWT y rate limiting continúa pendiente antes de producción.
+- Revisión independiente posterior: el hallazgo alto de traversal ya estaba resuelto mediante canonicalización y pruebas; se resolvieron además la normalización UTC de `created_at`, el `TEST_DATABASE_URL` faltante en el README E2E y la descripción inexacta del estado `unauthorized`. La validación afectada terminó backend unitario/API 82 passed, frontend 58 passed y build PASS.
 - Estado: cambios en `feat/hu-005-own-profile`, pendientes de revisión mediante PR; sin merge.

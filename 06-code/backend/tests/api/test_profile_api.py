@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi.testclient import TestClient
@@ -31,15 +31,16 @@ class ValidateStub:
 
 
 class ProfileStub:
-    def __init__(self, error: Exception | None = None) -> None:
+    def __init__(self, error: Exception | None = None, created_at: datetime = CREATED_AT) -> None:
         self.error = error
+        self.created_at = created_at
         self.principals: list[AuthenticatedPrincipal] = []
 
     def execute(self, principal: AuthenticatedPrincipal) -> OwnProfile:
         self.principals.append(principal)
         if self.error:
             raise self.error
-        return OwnProfile(USER_ID, "person@example.com", CREATED_AT)
+        return OwnProfile(USER_ID, "person@example.com", self.created_at)
 
 
 def client(profile: ProfileStub | None = None) -> tuple[TestClient, ProfileStub]:
@@ -73,6 +74,16 @@ def test_returns_exact_own_profile_without_secrets() -> None:
     assert "password" not in response.text
     assert "token" not in response.text
     assert_private(response)
+
+
+def test_normalizes_created_at_to_utc() -> None:
+    source_timezone = timezone(timedelta(hours=-5))
+    api, _ = client(ProfileStub(created_at=datetime(2026, 7, 21, 10, tzinfo=source_timezone)))
+
+    response = api.get("/api/v1/users/me", headers={"authorization": "Bearer valid.jwt"})
+
+    assert response.status_code == 200
+    assert response.json()["created_at"] == "2026-07-21T15:00:00Z"
 
 
 def test_client_supplied_user_ids_never_change_the_authenticated_identity() -> None:

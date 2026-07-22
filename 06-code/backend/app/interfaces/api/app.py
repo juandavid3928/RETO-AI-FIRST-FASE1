@@ -1,3 +1,4 @@
+from datetime import UTC
 from typing import Any, Protocol
 
 from fastapi import Depends, FastAPI, Request
@@ -283,7 +284,7 @@ def create_app(
         return {
             "id": str(profile.id),
             "email": profile.email,
-            "created_at": profile.created_at.isoformat().replace("+00:00", "Z"),
+            "created_at": profile.created_at.astimezone(UTC).isoformat().replace("+00:00", "Z"),
         }
 
     return app

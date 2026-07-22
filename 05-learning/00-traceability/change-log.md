@@ -199,4 +199,6 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 - `npm audit`: 0 vulnerabilidades; `uv lock --check`, Compose config, CSP, headers privados, frontera hexagonal, escaneo de secretos y `git diff --check`: PASS.
 - Puertos, credenciales y secreto JWT fueron efímeros; contenedores, red, volumen, env y artefactos Playwright se eliminaron mediante trap.
 
+**Revisión independiente resuelta:** la validación canónica de dot-segments de `authenticatedFetch` y sus pruebas ya estaban incorporadas antes de recibir el hallazgo; se normalizó `created_at` explícitamente a UTC con una prueba RED/GREEN para zona `-05:00`, se añadió `TEST_DATABASE_URL` al comando E2E documentado y se corrigió la descripción de estados de `ProfilePage`. Validación afectada posterior: backend unitario/API 82 passed, frontend 58 passed y build PASS.
+
 **Estado:** implementación en `feat/hu-005-own-profile`, pendiente de revisión mediante PR y sin merge.

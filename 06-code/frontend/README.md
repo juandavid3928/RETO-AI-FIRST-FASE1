@@ -10,10 +10,13 @@ npm test
 npm run build
 ```
 
-El E2E requiere que el stack Compose esté saludable y el mismo secreto JWT efímero usado por el backend:
+El E2E requiere que el stack Compose esté saludable, el mismo secreto JWT efímero usado por el backend y la URL PostgreSQL de pruebas expuesta por Compose:
 
 ```bash
-E2E_BASE_URL='http://127.0.0.1:8080' JWT_SECRET='<base64url-32-byte-minimum>' npm run test:e2e
+E2E_BASE_URL='http://127.0.0.1:8080' \
+JWT_SECRET='<base64url-32-byte-minimum>' \
+TEST_DATABASE_URL='<postgresql-test-url>' \
+npm run test:e2e
 ```
 
 La confirmación de registro nunca se envía al backend. Login acepta únicamente el contrato `access_token` JWT, `token_type: "bearer"` y `expires_in: 1800`, persiste la sesión mínima y navega con `replace` a `/profile`. `AuthSessionProvider` conserva exclusivamente `{ accessToken, expiresAt }` bajo `portal.auth.session`, elimina sesiones corruptas o expiradas, sincroniza `storage`, reevalúa visibilidad y administra un único temporizador. Logout es exclusivamente cliente.
