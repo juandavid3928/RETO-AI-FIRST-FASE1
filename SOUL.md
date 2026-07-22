@@ -203,3 +203,31 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Riesgos: `localStorage` conserva riesgo XSS residual, logout no revoca JWT y rate limiting continúa pendiente antes de producción.
 - Revisión independiente posterior: el hallazgo alto de traversal ya estaba resuelto mediante canonicalización y pruebas; se resolvieron además la normalización UTC de `created_at`, el `TEST_DATABASE_URL` faltante en el README E2E y la descripción inexacta del estado `unauthorized`. La validación afectada terminó backend unitario/API 82 passed, frontend 58 passed y build PASS.
 - Estado: cambios en `feat/hu-005-own-profile`, pendientes de revisión mediante PR; sin merge.
+
+## Checkpoint — 2026-07-21 — Pausa tras HU-005
+
+### Estado real verificado
+- PR #1 y #2 fusionados: estructura limpia y refinamiento del backlog, respectivamente.
+- HU-001 completada y fusionada mediante PR #3; merge `f1a82ef`.
+- HU-002 completada y fusionada mediante PR #4; merge `34f25f2`.
+- HU-005 completada y fusionada mediante PR #5; merge `940da47`.
+- `main` local se verificó limpia, sincronizada con `origin/main` y en `940da47a0b9d887e0593b153685c540515ff7790` inmediatamente antes de crear `docs/project-pause-checkpoint`.
+- El producto implementado comprende registro, login JWT y consulta del perfil propio; backend, frontend, PostgreSQL 16 y Docker Compose quedaron operativos en la validación integral final.
+- No se inició ninguna HU adicional. En particular, el análisis y la implementación de HU-003 permanecen pendientes.
+
+### Validaciones finales conocidas
+- Suite backend completa contra PostgreSQL 16 real desde volumen vacío: 90 passed.
+- Suite frontend completa: 58 passed; Playwright conjunto registro/login/perfil: 3 passed.
+- Build Vite, `npm audit`, `uv lock --check`, Compose config, CSP, headers privados, frontera hexagonal, escaneo de secretos y `git diff --check`: PASS.
+- Alembic fue restaurado a `20260721_0001 (head)` después de las pruebas con downgrade.
+- La limpieza automática eliminó contenedores, red, volumen, env, script temporal, `dist` y artefactos Playwright; una comprobación posterior confirmó cero recursos o temporales HU-005 restantes.
+
+### Riesgos vigentes
+- Riesgo XSS residual por persistir el JWT en `localStorage`.
+- Logout local sin revocación inmediata del token.
+- Rate limiting pendiente antes de producción.
+- Advertencia Starlette/TestClient no bloqueante.
+
+### Respaldo y siguiente acción
+- Se conserva `backup/repository-structure-a0dfd0a` en `a0dfd0a5250fadd372d8c4d8e3a32a0504710f70` para preservar el checkpoint de la estructura limpia inicial.
+- Al reanudar: analizar HU-003 y confirmar el dataset y el contrato de SECOP II. No implementar HU-003 sin una nueva instrucción de Codex.

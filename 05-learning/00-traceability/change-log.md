@@ -202,3 +202,13 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 **Revisión independiente resuelta:** la validación canónica de dot-segments de `authenticatedFetch` y sus pruebas ya estaban incorporadas antes de recibir el hallazgo; se normalizó `created_at` explícitamente a UTC con una prueba RED/GREEN para zona `-05:00`, se añadió `TEST_DATABASE_URL` al comando E2E documentado y se corrigió la descripción de estados de `ProfilePage`. Validación afectada posterior: backend unitario/API 82 passed, frontend 58 passed y build PASS.
 
 **Estado:** implementación en `feat/hu-005-own-profile`, pendiente de revisión mediante PR y sin merge.
+
+## 2026-07-21 — Project pause checkpoint after HU-005
+
+**Estado fusionado:** PR #1 estructura, PR #2 backlog, HU-001/PR #3 (`f1a82ef`), HU-002/PR #4 (`34f25f2`) y HU-005/PR #5 (`940da47`) están fusionados. Antes de crear la rama documental, `main` estaba limpia y sincronizada con `origin/main` en `940da47a0b9d887e0593b153685c540515ff7790`.
+
+**Producto disponible:** registro, login JWT y perfil propio; PostgreSQL 16, backend, frontend y Docker Compose operativos. La validación integral final observó backend 90 passed, frontend 58 passed, Playwright 3 passed y PASS en build, audit, lock, Compose, CSP, arquitectura, secretos y diff. Alembic terminó en `20260721_0001 (head)` y la infraestructura/temporales de validación fueron eliminados.
+
+**Pausa:** no se inició otra HU. HU-003 continúa pendiente de análisis; al retomar se debe confirmar dataset y contrato SECOP II antes de cualquier implementación y esperar una nueva instrucción de Codex. Se conserva `backup/repository-structure-a0dfd0a` como respaldo de la estructura limpia inicial.
+
+**Riesgos vigentes:** XSS residual por JWT en `localStorage`, logout sin revocación, rate limiting pendiente y advertencia Starlette/TestClient no bloqueante.
