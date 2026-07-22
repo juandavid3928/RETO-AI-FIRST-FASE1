@@ -1,5 +1,6 @@
 from app.application.use_cases.register_user import RegisterUser
 from app.application.use_cases.authenticate_user import AuthenticateUser
+from app.application.use_cases.get_own_profile import GetOwnProfile
 from app.application.use_cases.validate_access_token import ValidateAccessToken
 from app.infrastructure.database.postgres_user_repository import PostgresUserRepository
 from app.infrastructure.jwt_access_token import JwtAccessTokenService, decode_secret
@@ -25,6 +26,7 @@ def build_app(database_url: str, jwt_secret: str):
         register_user=register_user,
         authenticate_user=authenticate_user,
         validate_access_token=ValidateAccessToken(token_service),
+        get_own_profile=GetOwnProfile(users),
     )
 
     @app.get("/health")

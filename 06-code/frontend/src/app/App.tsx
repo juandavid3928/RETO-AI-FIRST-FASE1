@@ -1,15 +1,21 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
+import { AuthSessionProvider } from '../auth/AuthSessionProvider'
+import { RequireAuth } from '../auth/RequireAuth'
 import { LoginPage } from '../pages/LoginPage'
+import { ProfilePage } from '../pages/ProfilePage'
 import { RegisterPage } from '../pages/RegisterPage'
 
 export function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
+      <AuthSessionProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+        </Routes>
+      </AuthSessionProvider>
     </BrowserRouter>
   )
 }

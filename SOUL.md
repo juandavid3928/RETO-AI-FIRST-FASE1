@@ -188,3 +188,18 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Limpieza: contenedores, red, volumen, env efímero, script temporal y artefactos Playwright eliminados por trap.
 - Riesgos: continúan el riesgo XSS residual de `localStorage`, la ausencia de revocación inmediata y el rate limiting pendiente.
 - Próximo paso: crear y publicar el commit `fix: harden frontend authentication session` en el PR #4, sin merge.
+
+## Checkpoint — 2026-07-21 — HU-005 perfil propio privado
+
+- Alcance: exclusivamente HU-005 como primer incremento privado React → FastAPI → PostgreSQL; ninguna otra HU fue iniciada.
+- Contrato: `GET /api/v1/users/me`, perfil exacto `id`/`email`/`created_at`, identidad únicamente desde `AuthenticatedPrincipal.user_id`, usuario eliminado como `401 invalid_token` y headers privados en todas las respuestas.
+- Arquitectura: `GetOwnProfile` y `OwnProfile` permanecen en aplicación, `UserRepository.get_by_id` abstrae persistencia y dominio/aplicación continúan sin frameworks ni infraestructura.
+- Persistencia: consulta UUID parametrizada por primary key con cierre/rollback seguros; tabla `users`, migración y JWT permanecen sin cambios.
+- UI/sesión: `/profile`, `AuthSessionProvider`, `RequireAuth`, `authenticatedFetch` same-origin, login con `replace`, logout/`401` hacia `/login` y perfil únicamente en memoria.
+- RED observado: ausencia de caso de uso, 3 fallos de repositorio, 5 fallos de API, import ausente y 8 fallos iniciales frontend; la regresión detectó además 2 expectativas obsoletas. El primer E2E integral encontró 1 fallo de harness por no entregar `TEST_DATABASE_URL` a la prueba heredada y motivó repetición completa.
+- Evidencia final fresca: backend PostgreSQL 16 real 89 passed; frontend 58 passed; build Vite PASS; Playwright registro/login/perfil 3 passed; esquema `20260721_0001 (head)`.
+- Seguridad/calidad: aislamiento adversarial, token alterado, usuario eliminado, respuesta exacta, no-store/no-cache/Vary, CSP, audit 0, lock, Compose config, frontera hexagonal, secretos y `git diff --check` en verde.
+- Limpieza: credenciales/JWT y puertos efímeros; trap eliminó contenedores, red, volumen, env y artefactos Playwright.
+- Riesgos: `localStorage` conserva riesgo XSS residual, logout no revoca JWT y rate limiting continúa pendiente antes de producción.
+- Revisión independiente posterior: el hallazgo alto de traversal ya estaba resuelto mediante canonicalización y pruebas; se resolvieron además la normalización UTC de `created_at`, el `TEST_DATABASE_URL` faltante en el README E2E y la descripción inexacta del estado `unauthorized`. La validación afectada terminó backend unitario/API 82 passed, frontend 58 passed y build PASS.
+- Estado: cambios en `feat/hu-005-own-profile`, pendientes de revisión mediante PR; sin merge.

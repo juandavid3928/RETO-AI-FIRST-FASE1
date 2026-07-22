@@ -1,6 +1,6 @@
 # Auth API contract
 
-Estado: HU-001 fusionada. HU-002 implementada y validada localmente en `feat/hu-002-user-login`, pendiente de publicación y revisión mediante PR.
+Estado: HU-001 y HU-002 fusionadas. HU-005 implementada y validada en `feat/hu-005-own-profile`, pendiente de revisión mediante PR.
 
 ## HU-001 — `POST /api/v1/auth/register`
 
@@ -108,7 +108,7 @@ Toda respuesta de login incluye `Cache-Control: no-store` y `Pragma: no-cache`.
 
 El lookup usa email canónico y SQL parametrizado. Un usuario inexistente ejecuta una verificación Argon2id contra un hash dummy generado con los mismos parámetros recomendados; no se registran email, password, hash, JWT ni resultados sensibles.
 
-### Contrato Bearer para futuros recursos protegidos
+### Contrato Bearer para recursos protegidos
 
 La dependencia productiva usa `HTTPBearer(auto_error=False)` y valida el JWT contra el contrato anterior:
 
@@ -116,18 +116,50 @@ La dependencia productiva usa `HTTPBearer(auto_error=False)` y valida el JWT con
 - token inválido o expirado: `401 invalid_token`;
 - ambos incluyen `WWW-Authenticate: Bearer`.
 
-HU-002 no agrega una ruta privada productiva. La dependencia se ejercita mediante una ruta creada únicamente dentro de tests; el primer recurso privado pertenece a HU-005.
+HU-002 creó y probó esta dependencia. HU-005 la reutiliza sin volver a decodificar el JWT y obtiene la identidad únicamente de `AuthenticatedPrincipal.user_id`.
 
 ### Sesión frontend
 
-- `/login` permanece como destino después del éxito y muestra el estado autenticado.
+- Un login exitoso navega mediante `replace` a `/profile`.
 - El cliente acepta la respuesta `200` solo si contiene exactamente un JWT estructural, `token_type: "bearer"` y `expires_in: 1800`; cualquier contrato malformado limpia la sesión y produce un error genérico.
 - `localStorage` usa la clave `portal.auth.session` y guarda exclusivamente `{ "accessToken": "<JWT>", "expiresAt": 0 }`, donde `expiresAt` es epoch en milisegundos.
-- La sesión válida se restaura al recargar y se sincroniza entre pestañas mediante `storage`; una sesión corrupta o expirada se elimina. Al recuperar visibilidad se reevalúa la expiración.
+- `AuthSessionProvider` restaura una sesión válida, administra un único temporizador, sincroniza pestañas mediante `storage` y reevalúa expiración al recuperar visibilidad. Una sesión corrupta o expirada se elimina.
 - Logout es exclusivamente cliente: elimina almacenamiento, estado y temporizador. No revoca un token robado, que sigue válido hasta `exp`.
 - El riesgo XSS residual de `localStorage` se reduce mediante CSP estricta, ausencia de scripts de terceros y prohibición de registrar o incluir tokens en URLs.
-- `authenticatedFetch` no está implementado; se añadirá con la primera capacidad privada autorizada.
+- `authenticatedFetch` acepta solo rutas relativas bajo `/api/`, obtiene el token del provider, impide sobrescribir `Authorization`, clasifica fallos y limpia la sesión ante cualquier `401`; no navega ni registra el token.
 
-## Fuera de HU-002
+## HU-005 — `GET /api/v1/users/me`
 
-HU-005 y sus recursos privados, refresh tokens, cookies, sesiones server-side, roles, permisos, MFA, login social, recuperación de contraseña, revocación, `kid` y rate limiting quedan fuera. Rate limiting se mantiene como hardening pendiente antes de producción.
+### Solicitud
+
+```http
+GET /api/v1/users/me
+Authorization: Bearer <JWT>
+```
+
+No acepta identidad seleccionable. Cualquier `user_id` adicional en query, body o headers no participa en el lookup; el usuario se obtiene exclusivamente del `sub` validado representado por `AuthenticatedPrincipal.user_id`.
+
+### Respuesta exitosa — `200 OK`
+
+```json
+{
+  "id": "b7d3a91e-78d1-4ad4-b8f5-c20a70ebfa75",
+  "email": "visitor@example.com",
+  "created_at": "2026-07-21T15:00:00Z"
+}
+```
+
+La forma es exacta. No expone `password_hash`, JWT, claims, `updated_at` ni campos adicionales. Todas las respuestas de esta ruta incluyen `Cache-Control: no-store`, `Pragma: no-cache` y `Vary: Authorization`.
+
+| HTTP | `code` | Uso |
+|---|---|---|
+| 401 | `authentication_required` | Bearer ausente. |
+| 401 | `invalid_token` | JWT inválido/expirado o `sub` sin usuario persistido. Incluye `WWW-Authenticate: Bearer`. |
+| 503 | `database_unavailable` | PostgreSQL no está disponible. |
+| 500 | `internal_error` | Fallo inesperado, sin detalles internos. |
+
+`GetOwnProfile` recibe el principal, consulta `UserRepository.get_by_id` y proyecta `OwnProfile`; nunca devuelve la entidad `User` completa. La tabla y el JWT permanecen sin cambios.
+
+## Fuera del incremento de autenticación/perfil
+
+Edición de perfil, refresh tokens, cookies, sesiones server-side, roles, permisos, MFA, login social, recuperación de contraseña, revocación, `kid` y rate limiting quedan fuera. Rate limiting se mantiene como hardening pendiente antes de producción.

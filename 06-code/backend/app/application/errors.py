@@ -12,3 +12,7 @@ class InvalidCredentials(Exception):
 
 class InvalidAccessToken(Exception):
     pass
+
+
+class AuthenticatedUserNotFound(Exception):
+    pass

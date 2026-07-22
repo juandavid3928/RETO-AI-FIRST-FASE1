@@ -16,14 +16,15 @@ frontend/
 │   ├── main.tsx
 │   ├── app/App.tsx
 │   ├── auth/authSession.ts
-│   ├── pages/{RegisterPage,LoginPage}.tsx
-│   ├── services/{register,login}.ts
+│   ├── auth/{AuthSessionProvider,RequireAuth}.tsx
+│   ├── pages/{RegisterPage,LoginPage,ProfilePage}.tsx
+│   ├── services/{register,login,authenticatedFetch,profile}.ts
 │   └── styles/index.css
 └── tests/
     ├── setup.ts
-    ├── {register,login}.test.tsx
+    ├── {register,login,profile,authenticatedFetch}.test.tsx
     ├── authSession.test.ts
-    └── e2e/{register,login}.spec.ts
+    └── e2e/{register,login,profile}.spec.ts
 ```
 
-Las rutas productivas son `/register` y `/login`. `auth/authSession.ts` centraliza validación, persistencia, restauración, expiración y limpieza segura bajo `portal.auth.session`; `LoginPage` sincroniza cambios entre pestañas y reevalúa al recuperar visibilidad. Logout continúa siendo cliente. `authenticatedFetch` se difiere hasta la primera capacidad privada autorizada; no existe todavía una pantalla privada de HU-005.
+Las rutas productivas son `/register`, `/login` y `/profile`. `AuthSessionProvider` centraliza restauración, expiración, sincronización multitab, visibilidad y logout sobre la sesión mínima de `authSession.ts`; `RequireAuth` es únicamente un guard de UX. `authenticatedFetch` restringe destinos canónicos a rutas relativas `/api/`, inyecta el Bearer no sobrescribible desde el provider, clasifica errores y limpia la sesión ante `401` sin navegar. `ProfilePage` mantiene en memoria únicamente `id`, `email` y `created_at`, valida el payload exacto y diferencia loading, success, network, server y storage error; ante `401` no conserva un estado intermedio y navega con `replace` a `/login`.

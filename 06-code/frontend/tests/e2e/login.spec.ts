@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { createHmac } from 'node:crypto'
 
-test('registered user signs in, persists the JWT session, and logs out locally', async ({ page }) => {
+test('registered user signs in, persists the JWT session, reaches own profile, and logs out locally', async ({ page }) => {
   const email = `login-${Date.now()}@example.com`
   const password = 'correct horse battery'
 
@@ -17,8 +17,9 @@ test('registered user signs in, persists the JWT session, and logs out locally',
   await page.getByLabel('Password').fill(password)
   await page.getByRole('button', { name: 'Sign in' }).click()
 
-  await expect(page).toHaveURL(/\/login$/)
-  await expect(page.getByText('You are authenticated.')).toBeVisible()
+  await expect(page).toHaveURL(/\/profile$/)
+  await expect(page.getByRole('heading', { name: 'Your profile' })).toBeVisible()
+  await expect(page.getByText(email)).toBeVisible()
   const storedSession = await page.evaluate(() => localStorage.getItem('portal.auth.session'))
   expect(storedSession).not.toBeNull()
   const session = JSON.parse(storedSession!) as { accessToken: unknown; expiresAt: unknown }
@@ -46,7 +47,8 @@ test('registered user signs in, persists the JWT session, and logs out locally',
   expect(session.expiresAt).toBeGreaterThan(Date.now())
 
   await page.reload()
-  await expect(page.getByText('You are authenticated.')).toBeVisible()
+  await expect(page).toHaveURL(/\/profile$/)
+  await expect(page.getByText(email)).toBeVisible()
 
   await page.evaluate(() => {
     const key = 'portal.auth.session'
@@ -60,7 +62,8 @@ test('registered user signs in, persists the JWT session, and logs out locally',
   await page.getByLabel('Email').fill(email)
   await page.getByLabel('Password').fill(password)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page.getByText('You are authenticated.')).toBeVisible()
+  await expect(page).toHaveURL(/\/profile$/)
+  await expect(page.getByText(email)).toBeVisible()
   await page.getByRole('button', { name: 'Log out' }).click()
   await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
   expect(await page.evaluate(() => localStorage.getItem('portal.auth.session'))).toBeNull()
