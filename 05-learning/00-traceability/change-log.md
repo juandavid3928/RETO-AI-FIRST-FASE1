@@ -212,3 +212,30 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 **Pausa:** no se inició otra HU. HU-003 continúa pendiente de análisis; al retomar se debe confirmar dataset y contrato SECOP II antes de cualquier implementación y esperar una nueva instrucción de Codex. Se conserva `backup/repository-structure-a0dfd0a` como respaldo de la estructura limpia inicial.
 
 **Riesgos vigentes:** XSS residual por JWT en `localStorage`, logout sin revocación, rate limiting pendiente y advertencia Starlette/TestClient no bloqueante.
+
+## 2026-07-22 — Analyze HU-003 SECOP II contract
+
+**Tipo:** requisitos | arquitectura | integración externa | documentación
+
+**Alcance:** análisis documental para HU-003. No se implementó backend, frontend, migraciones, pruebas productivas ni E2E; HU-004, HU-010 y demás HU no fueron iniciadas.
+
+**Fuentes inspeccionadas:**
+- `SOUL.md`.
+- `05-learning/03-requirements/`.
+- `05-learning/02-architecture/`.
+- Documentación vigente de `06-code/`.
+- Metadata y consulta pública acotada del dataset oficial datos.gov.co `SECOP II - Procesos de Contratación` (`p6dx-8zbt`).
+
+**Resultados:**
+- Se recomendó `https://www.datos.gov.co/resource/p6dx-8zbt.json` como fuente SECOP II oficial para HU-003.
+- Se definió “convocatoria vigente” como proceso con `estado_de_apertura_del_proceso = 'Abierto'` y `fecha_de_recepcion_de` no vencida.
+- Se propuso el endpoint privado `GET /api/v1/opportunities` con paginación, timeout y DTO normalizado.
+- Se ajustaron criterios AC-HU-003-01 a AC-HU-003-05 para reflejar backend-only, DTO, estados UI y fallos externos.
+- Se documentó microplan TDD para una iteración posterior sin crear código.
+
+**Áreas afectadas:**
+- `SOUL.md`
+- `05-learning/00-traceability/change-log.md`
+- `05-learning/03-requirements/`
+
+**Pendiente:** Codex y el humano deben ratificar dataset, clave estable, definición de vigencia, contrato, privacidad y límites antes de autorizar implementación.
