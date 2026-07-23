@@ -242,3 +242,16 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Estados UI definidos: `loading`, `empty`, `external_error` y `success`; frontend consume únicamente API propia y no llama directamente a datos.gov.co.
 - Riesgos documentados: disponibilidad/rate limits de datos.gov.co, cambios de esquema, datos incompletos, semántica de vigencia, duplicados y monto COP sin conversión a centavos en el listado.
 - Decisiones pendientes: ratificar dataset, clave estable, fecha de vigencia, endpoint/DTO, privacidad, paginación/orden/timeout antes de autorizar implementación TDD.
+
+## Checkpoint — 2026-07-23 — HU-003 exploración de convocatorias vigentes
+
+- Alcance: exclusivamente HU-003 browse/listado inicial de convocatorias vigentes SECOP II. No se iniciaron HU-004 filtros, HU-010 detalle, favoritos, búsquedas guardadas ni dashboard.
+- Fuente externa implementada: datos.gov.co `SECOP II - Procesos de Contratación` (`p6dx-8zbt`) vía `https://www.datos.gov.co/resource/p6dx-8zbt.json`; `SECOP_BASE_URL` queda como override opcional para stubs determinísticos.
+- Contrato backend: `GET /api/v1/opportunities?page=1&page_size=20`, privado con Bearer JWT, headers `Cache-Control: no-store`, `Pragma: no-cache`, `Vary: Authorization`, `401` sin sesión válida, `422` por paginación inválida, `503 external_service_unavailable` para fallos SECOP y `200` con página normalizada.
+- Vigencia implementada: fecha actual de Colombia calculada en backend; SoQL acotado con `estado_de_apertura_del_proceso='Abierto'`, `fecha_de_recepcion_de >= YYYY-MM-DDT00:00:00`, `id_del_proceso` obligatorio, orden por `fecha_de_recepcion_de`, `fecha_de_publicacion_del` e `id_del_proceso`.
+- DTO final: `id`, `reference`, `entity_name`, `title`, `description`, `status`, `summary_status`, `opening_status`, `published_at`, `closing_at`, `estimated_amount_cop`, `source_url`; `estimated_amount_cop` permanece en COP sin conversión a centavos.
+- Frontend: ruta privada `/opportunities`, navegación mínima desde `/profile`, `authenticatedFetch`, parser estricto, estados `loading`, `empty`, `external_error` y `success`, sin persistir oportunidades en `localStorage`.
+- TDD: RED observado para imports/route ausente en backend y frontend antes de GREEN; GREEN con backend unitario/API HU-003, suite frontend, build y E2E determinístico con stub SECOP.
+- Evidencia final: backend completo contra PostgreSQL 16 real `107 passed`; frontend `64 passed`; Playwright registro/login/perfil/oportunidades `4 passed`; build Vite PASS; `npm audit` 0 vulnerabilidades; `uv lock --check`, Compose config y consulta viva SECOP acotada PASS.
+- Persistencia: no se crearon migraciones, no se modificó la tabla `users` y no se persisten oportunidades.
+- Riesgos residuales: disponibilidad/rate limits/cambios de esquema de datos.gov.co, unicidad futura de `id_del_proceso` antes de favoritos, y riesgo XSS residual por JWT en `localStorage` ya conocido.

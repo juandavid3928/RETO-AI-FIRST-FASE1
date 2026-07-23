@@ -239,3 +239,37 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 - `05-learning/03-requirements/`
 
 **Pendiente:** Codex y el humano deben ratificar dataset, clave estable, definición de vigencia, contrato, privacidad y límites antes de autorizar implementación.
+
+## 2026-07-23 — Implement HU-003 opportunity browse
+
+**Tipo:** backend | frontend | integración externa | pruebas | documentación
+
+**Alcance:** HU-003 — exploración privada de convocatorias vigentes. No se implementaron filtros HU-004, detalle HU-010, favoritos, búsquedas guardadas ni dashboard.
+
+**Resultados:**
+- Backend hexagonal: puerto/caso de uso `ListCurrentOpportunities`, DTO interno, fecha actual de Colombia inyectable y adaptador SECOP en `app/infrastructure/external/`.
+- Integración SECOP: dataset `p6dx-8zbt`, endpoint `https://www.datos.gov.co/resource/p6dx-8zbt.json`, SoQL acotado, timeout 5s, normalización estricta y fallos externos controlados.
+- API: `GET /api/v1/opportunities?page=1&page_size=20`, privada con Bearer JWT, paginación 1..50, headers privados, `401`/`422`/`503`/`200` estables.
+- Frontend: `/opportunities` privada, navegación desde `/profile`, `authenticatedFetch`, parser estricto, estados loading/empty/external_error/success y sin persistencia de oportunidades.
+- Dependencias: `httpx` pasó a dependencia runtime porque el adaptador SECOP productivo lo usa; `uv.lock` actualizado.
+- Compose: `SECOP_BASE_URL` opcional y `host.docker.internal` para E2E determinístico con stub local.
+
+**Evidencia RED observada:**
+- Backend HU-003 focalizado falló por imports ausentes de `InvalidPagination`, `ExternalOpportunitySourceUnavailable`, caso de uso y adaptador.
+- Frontend HU-003 focalizado falló por servicio/ruta `/opportunities` inexistentes.
+
+**Evidencia GREEN final:**
+- Backend focalizado HU-003: 17 passed.
+- Backend unitario/API: 99 passed.
+- Backend completo con PostgreSQL 16 real: 107 passed.
+- Frontend completo: 64 passed.
+- Build Vite: PASS.
+- Playwright registro/login/perfil/oportunidades con SECOP stub: 4 passed.
+- `npm audit --audit-level=high`: 0 vulnerabilidades.
+- `uv lock --check`: PASS.
+- Docker Compose config: PASS.
+- Consulta viva SECOP de solo lectura con `$limit=1`: PASS como evidencia externa no determinística.
+
+**Limpieza:** contenedores, red, volumen, env temporal, script temporal, `dist`, `test-results` y `playwright-report` eliminados.
+
+**Riesgos residuales:** disponibilidad/rate limits/cambios de esquema de datos.gov.co, necesidad de revalidar unicidad de `id_del_proceso` antes de favoritos y riesgo XSS residual por `localStorage` ya conocido.

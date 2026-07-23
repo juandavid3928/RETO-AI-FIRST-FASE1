@@ -1,11 +1,15 @@
-from app.application.use_cases.register_user import RegisterUser
+import os
+
 from app.application.use_cases.authenticate_user import AuthenticateUser
 from app.application.use_cases.get_own_profile import GetOwnProfile
+from app.application.use_cases.list_current_opportunities import ListCurrentOpportunities
+from app.application.use_cases.register_user import RegisterUser
 from app.application.use_cases.validate_access_token import ValidateAccessToken
 from app.infrastructure.database.postgres_user_repository import PostgresUserRepository
+from app.infrastructure.external.secop_opportunity_source import SecopOpportunitySource
 from app.infrastructure.jwt_access_token import JwtAccessTokenService, decode_secret
 from app.infrastructure.password_hasher import Argon2PasswordHasher
-from app.infrastructure.system import SystemClock, Uuid4Generator
+from app.infrastructure.system import ColombiaDateProvider, SystemClock, Uuid4Generator
 from app.interfaces.api.app import create_app
 
 
@@ -27,6 +31,10 @@ def build_app(database_url: str, jwt_secret: str):
         authenticate_user=authenticate_user,
         validate_access_token=ValidateAccessToken(token_service),
         get_own_profile=GetOwnProfile(users),
+        list_current_opportunities=ListCurrentOpportunities(
+            SecopOpportunitySource(base_url=os.getenv("SECOP_BASE_URL", "https://www.datos.gov.co/resource/p6dx-8zbt.json")),
+            ColombiaDateProvider(),
+        ),
     )
 
     @app.get("/health")

@@ -2,7 +2,7 @@
 
 ## Estado
 
-Backlog funcional completo. HU-001, HU-002 y HU-005 fueron fusionadas. HU-003, HU-004 y HU-006 a HU-011 no autorizan implementación y requieren aprobación de criterios, contrato y microplan.
+Backlog funcional completo. HU-001, HU-002, HU-003 y HU-005 fueron fusionadas o implementadas en la rama vigente. HU-004 y HU-006 a HU-011 no autorizan implementación y requieren aprobación de criterios, contrato y microplan.
 
 Prioridad:
 
@@ -57,7 +57,7 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Prioridad:** P0.
 - **Dependencias:** HU-002.
 - **Fuente:** OF-01, OF-03, OF-04, OF-06, OF-07; AP-03, AP-04; IN-06, IN-07, IN-09.
-- **Estado:** HU-003 original modificada y acotada al browse; pendiente de aprobación para implementación.
+- **Estado:** implementada y validada en `feat/hu-003-explore-opportunities`; pendiente de revisión mediante PR.
 - **Criterios:** AC-HU-003-01 a AC-HU-003-05.
 
 ## HU-004 — Filtrar convocatorias

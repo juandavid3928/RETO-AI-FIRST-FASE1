@@ -16,3 +16,11 @@ class InvalidAccessToken(Exception):
 
 class AuthenticatedUserNotFound(Exception):
     pass
+
+
+class InvalidPagination(Exception):
+    pass
+
+
+class ExternalOpportunitySourceUnavailable(Exception):
+    pass

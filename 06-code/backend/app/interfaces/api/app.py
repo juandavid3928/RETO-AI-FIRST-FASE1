@@ -1,7 +1,7 @@
 from datetime import UTC
 from typing import Any, Protocol
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -13,10 +13,13 @@ from app.application.errors import (
     AuthenticatedUserNotFound,
     DatabaseUnavailable,
     DuplicateEmail,
+    ExternalOpportunitySourceUnavailable,
     InvalidAccessToken,
     InvalidCredentials,
+    InvalidPagination,
 )
 from app.application.use_cases.get_own_profile import OwnProfile
+from app.application.use_cases.list_current_opportunities import OpportunityPage
 from app.application.use_cases.validate_access_token import AuthenticatedPrincipal
 from app.domain.errors import InvalidEmail, InvalidPassword
 from app.domain.user import Email, User
@@ -82,7 +85,7 @@ class PrivateNoStoreMiddleware:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         path = scope.get("path")
-        if scope["type"] != "http" or path not in {"/api/v1/auth/login", "/api/v1/users/me"}:
+        if scope["type"] != "http" or path not in {"/api/v1/auth/login", "/api/v1/users/me", "/api/v1/opportunities"}:
             await self._app(scope, receive, send)
             return
 
@@ -92,7 +95,7 @@ class PrivateNoStoreMiddleware:
                     (b"cache-control", b"no-store"),
                     (b"pragma", b"no-cache"),
                 ]
-                if path == "/api/v1/users/me":
+                if path in {"/api/v1/users/me", "/api/v1/opportunities"}:
                     private_headers.append((b"vary", b"Authorization"))
                 message["headers"] = list(message.get("headers", [])) + private_headers
             await send(message)
@@ -114,6 +117,10 @@ class ValidateAccessTokenPort(Protocol):
 
 class GetOwnProfilePort(Protocol):
     def execute(self, principal: AuthenticatedPrincipal) -> OwnProfile: ...
+
+
+class ListCurrentOpportunitiesPort(Protocol):
+    def execute(self, *, page: int, page_size: int) -> OpportunityPage: ...
 
 
 class RegistrationRequest(BaseModel):
@@ -166,6 +173,7 @@ def create_app(
     authenticate_user: AuthenticateUserPort | None = None,
     validate_access_token: ValidateAccessTokenPort | None = None,
     get_own_profile: GetOwnProfilePort | None = None,
+    list_current_opportunities: ListCurrentOpportunitiesPort | None = None,
 ) -> FastAPI:
     app = FastAPI(title="Portal de Convocatorias API")
     app.add_middleware(AuthBodyLimitMiddleware)
@@ -285,6 +293,30 @@ def create_app(
             "id": str(profile.id),
             "email": profile.email,
             "created_at": profile.created_at.astimezone(UTC).isoformat().replace("+00:00", "Z"),
+        }
+
+    @app.get("/api/v1/opportunities")
+    def opportunities(
+        _: AuthenticatedPrincipal = Depends(require_principal),
+        page: int = Query(1, ge=1),
+        page_size: int = Query(20, ge=1, le=50),
+    ) -> Any:
+        if list_current_opportunities is None:
+            raise RuntimeError("Opportunities are not configured")
+        try:
+            result = list_current_opportunities.execute(page=page, page_size=page_size)
+        except InvalidPagination:
+            return validation_response(message="Opportunity query is invalid.")
+        except ExternalOpportunitySourceUnavailable:
+            return JSONResponse(
+                status_code=503,
+                content={"error": {"code": "external_service_unavailable", "message": "Opportunities are temporarily unavailable."}},
+            )
+        return {
+            "items": [item.__dict__ for item in result.items],
+            "page": result.page,
+            "page_size": result.page_size,
+            "has_more": result.has_more,
         }
 
     return app
