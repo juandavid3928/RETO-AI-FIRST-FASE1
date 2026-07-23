@@ -26,6 +26,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       SECOP_BASE_URL: ${SECOP_BASE_URL:-https://www.datos.gov.co/resource/p6dx-8zbt.json}
+      SECOP_TIMEOUT_SECONDS: ${SECOP_TIMEOUT_SECONDS:-5}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

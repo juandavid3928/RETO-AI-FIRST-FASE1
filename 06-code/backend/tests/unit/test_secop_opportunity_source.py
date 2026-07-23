@@ -72,6 +72,23 @@ def test_timeout_is_external_unavailable() -> None:
         source_for(handler).list_current(current_date=date(2026, 7, 23), page=1, page_size=20)
 
 
+def test_uses_configured_timeout_for_secop_request() -> None:
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["timeout"] = request.extensions["timeout"]
+        return httpx.Response(200, json=[])
+
+    SecopOpportunitySource(
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+        base_url="https://example.test/secop",
+        timeout_seconds=2.5,
+    ).list_current(current_date=date(2026, 7, 23), page=1, page_size=20)
+
+    assert seen["timeout"]["connect"] == 2.5
+    assert seen["timeout"]["read"] == 2.5
+
+
 def test_invalid_json_and_malformed_rows_are_external_unavailable() -> None:
     invalid_json = source_for(lambda _: httpx.Response(200, content=b"not-json"))
     with pytest.raises(ExternalOpportunitySourceUnavailable):

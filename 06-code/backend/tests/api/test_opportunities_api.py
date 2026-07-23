@@ -102,6 +102,10 @@ def test_opportunities_validates_pagination_query_parameters() -> None:
     response = api.get("/api/v1/opportunities?page=0&page_size=51", headers={"authorization": "Bearer valid.jwt"})
 
     assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"
+    assert response.json()["error"]["message"] == "Opportunity query is invalid."
+    assert "page" in response.json()["error"]["fields"]
+    assert "page_size" in response.json()["error"]["fields"]
     assert stub.calls == []
     assert_private(response)
 

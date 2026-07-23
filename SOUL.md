@@ -255,3 +255,12 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Evidencia final: backend completo contra PostgreSQL 16 real `107 passed`; frontend `64 passed`; Playwright registro/login/perfil/oportunidades `4 passed`; build Vite PASS; `npm audit` 0 vulnerabilidades; `uv lock --check`, Compose config y consulta viva SECOP acotada PASS.
 - Persistencia: no se crearon migraciones, no se modificó la tabla `users` y no se persisten oportunidades.
 - Riesgos residuales: disponibilidad/rate limits/cambios de esquema de datos.gov.co, unicidad futura de `id_del_proceso` antes de favoritos, y riesgo XSS residual por JWT en `localStorage` ya conocido.
+
+## Checkpoint — 2026-07-23 — Correcciones revisión Codex HU-003
+
+- Alcance: corrección exclusiva de hallazgos HU-003 sobre validación `422` de `/api/v1/opportunities` y configuración SECOP. No se iniciaron HU-004, HU-010 ni otras HUs.
+- API: los errores de query inválida en `GET /api/v1/opportunities` devuelven `422 validation_error` con mensaje `Opportunity query is invalid.`, no invocan el caso de uso y conservan headers privados.
+- Configuración: `SECOP_BASE_URL` y `SECOP_TIMEOUT_SECONDS` quedan integrados al flujo `Settings`/`.env`; `bootstrap.py` ya no lee `os.getenv()` directamente.
+- Defaults: `SECOP_BASE_URL=https://www.datos.gov.co/resource/p6dx-8zbt.json` y `SECOP_TIMEOUT_SECONDS=5`.
+- Adaptador SECOP: recibe timeout configurable y lo aplica a la solicitud HTTP externa.
+- Persistencia y alcance: no se agregaron migraciones, tablas ni persistencia de oportunidades.

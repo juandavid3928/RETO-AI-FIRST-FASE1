@@ -273,3 +273,19 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 **Limpieza:** contenedores, red, volumen, env temporal, script temporal, `dist`, `test-results` y `playwright-report` eliminados.
 
 **Riesgos residuales:** disponibilidad/rate limits/cambios de esquema de datos.gov.co, necesidad de revalidar unicidad de `id_del_proceso` antes de favoritos y riesgo XSS residual por `localStorage` ya conocido.
+
+## 2026-07-23 — Address HU-003 Codex review findings
+
+**Tipo:** backend | configuración | pruebas | documentación
+
+**Alcance:** corrección de HU-003 únicamente. No se implementaron filtros HU-004, detalle HU-010, favoritos, búsquedas guardadas, dashboard, migraciones, nuevas tablas ni persistencia de oportunidades.
+
+**Hallazgos corregidos:**
+- `GET /api/v1/opportunities?page=0&page_size=51` ahora responde `422 validation_error` con mensaje `Opportunity query is invalid.`, conserva headers privados y no invoca el caso de uso.
+- `SECOP_BASE_URL` y `SECOP_TIMEOUT_SECONDS` pasan por `Settings`/`.env`; `bootstrap.py` no lee `os.getenv()`.
+- `SecopOpportunitySource` recibe timeout configurable y lo usa en la solicitud externa. Defaults: dataset oficial `p6dx-8zbt` y timeout `5` segundos.
+
+**Evidencia RED observada:**
+- La prueba de query inválida falló porque devolvía `Registration data is invalid.`.
+- Las pruebas de settings SECOP fallaron porque `Settings` no exponía `secop_base_url` ni `secop_timeout_seconds`.
+- La prueba de timeout configurable falló porque `SecopOpportunitySource` no aceptaba `timeout_seconds`.

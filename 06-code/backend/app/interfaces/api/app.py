@@ -204,11 +204,12 @@ def create_app(
             location = error.get("loc", ())
             field = str(location[-1]) if location else "body"
             fields.setdefault(field, []).append(str(error.get("msg", "Invalid value.")))
-        message = (
-            "Login data is invalid."
-            if request.url.path == "/api/v1/auth/login"
-            else "Registration data is invalid."
-        )
+        if request.url.path == "/api/v1/auth/login":
+            message = "Login data is invalid."
+        elif request.url.path == "/api/v1/opportunities":
+            message = "Opportunity query is invalid."
+        else:
+            message = "Registration data is invalid."
         return validation_response(fields, message=message)
 
     @app.exception_handler(BearerFailure)

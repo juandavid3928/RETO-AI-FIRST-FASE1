@@ -27,8 +27,9 @@ DEFAULT_BASE_URL = "https://www.datos.gov.co/resource/p6dx-8zbt.json"
 
 
 class SecopOpportunitySource:
-    def __init__(self, *, client: httpx.Client | None = None, base_url: str = DEFAULT_BASE_URL) -> None:
-        self._client = client or httpx.Client(timeout=5.0)
+    def __init__(self, *, client: httpx.Client | None = None, base_url: str = DEFAULT_BASE_URL, timeout_seconds: float = 5.0) -> None:
+        self._timeout_seconds = timeout_seconds
+        self._client = client or httpx.Client(timeout=timeout_seconds)
         self._base_url = base_url
 
     def list_current(self, *, current_date: date, page: int, page_size: int) -> OpportunityPage:
@@ -40,7 +41,7 @@ class SecopOpportunitySource:
             "$offset": str((page - 1) * page_size),
         }
         try:
-            response = self._client.get(self._base_url, params=params, timeout=5.0)
+            response = self._client.get(self._base_url, params=params, timeout=self._timeout_seconds)
         except httpx.TimeoutException as exc:
             raise ExternalOpportunitySourceUnavailable from exc
         except httpx.HTTPError as exc:
