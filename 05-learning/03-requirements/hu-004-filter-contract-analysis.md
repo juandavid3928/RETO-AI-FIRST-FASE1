@@ -55,7 +55,7 @@ HU-004 debe extender lo ya integrado por HU-003:
 
 ## Contrato propuesto
 
-Decisión propuesta: extender el endpoint existente, no crear endpoint nuevo.
+Decisión documental cerrada para HU-004: extender el endpoint existente, no crear endpoint nuevo.
 
 ```text
 GET /api/v1/opportunities?page=1&page_size=20&entity=<texto>&closing_from=YYYY-MM-DD&closing_to=YYYY-MM-DD&status=<valor>
@@ -95,7 +95,7 @@ Decisión propuesta:
 - Normalización: trim exterior, colapsar espacios internos consecutivos a uno y rechazar resultado vacío.
 - Longitud: mínimo 3 caracteres después de normalizar; máximo 120 caracteres.
 - Caracteres: permitir texto Unicode, números, espacios y signos comunes de nombres institucionales; escapar comillas simples para SoQL o construir el predicado mediante helper de quoting controlado.
-- Semántica SoQL recomendada: `upper(entidad) like '%<ENTITY_UPPER_ESCAPED>%'` si Socrata soporta `upper`; alternativa conservadora si se detecta incompatibilidad: mantener coincidencia parcial case-sensitive documentada como limitación y pedir aprobación antes de degradar UX.
+- Semántica SoQL cerrada: `upper(entidad) like '%<ENTITY_UPPER_ESCAPED>%'`. La consulta viva de solo lectura ejecutada para este PR confirmó compatibilidad de Socrata con `upper(entidad) like` sobre `p6dx-8zbt`.
 
 Justificación del mínimo de 3 caracteres: reduce consultas masivas y ruido, sin impedir búsquedas reales como `SENA`, `ANI` o municipios de nombres cortos.
 
@@ -120,7 +120,7 @@ Convivencia con HU-003:
 - HU-003 siempre mantiene `fecha_de_recepcion_de >= fecha actual de Colombia a las 00:00:00`.
 - El filtro efectivo inferior es el más restrictivo entre fecha actual Colombia y `closing_from`.
 - `closing_to` puede acotar hacia una fecha futura cercana.
-- Si `closing_to` es anterior a la fecha actual Colombia, la consulta es válida y debe producir `empty` sin consultar SECOP o con una decisión explícita de short-circuit local. Recomendación: short-circuit local a página vacía para evitar tráfico externo imposible bajo la regla de vigencia.
+- Si `closing_to` es anterior a la fecha actual Colombia, la consulta es válida y debe producir `empty` mediante short-circuit local, sin consultar SECOP, porque la regla de vigencia HU-003 hace imposible cualquier coincidencia.
 
 No se propone filtrar por `fecha_de_publicacion_del` para HU-004 porque la historia habla de oportunidad vigente y HU-003 ya modela `fecha_de_recepcion_de` como `closing_at`/fecha límite operativa.
 
@@ -137,12 +137,13 @@ Campos evaluados:
 | `estado_del_procedimiento` | Expuesto como `status`, no filtro inicial recomendado. | Puede ser amplio/ambiguo (“Publicado”) y menos útil para reducir fases de oportunidad. |
 | Combinación | No recomendada inicialmente. | Aumenta ambigüedad, enum y pruebas sin valor mínimo adicional. |
 
-Enum inicial recomendado para `status`:
+Enum cerrado para `status` en HU-004 inicial:
 
 - `presentation` → `estado_resumen = 'Presentación de oferta'`.
-- `published` → `estado_del_procedimiento = 'Publicado'` solo si Codex exige compatibilidad con el campo `status` del DTO; en esta propuesta queda como decisión pendiente, no default.
 
-Decisión concreta default: aceptar únicamente `status=presentation` en HU-004 inicial y mapearlo a `estado_resumen='Presentación de oferta'`. Si se requiere más de un valor, debe validarse con metadata/consulta viva acotada antes de implementación y documentarse como ampliación aprobada.
+No se agregan otros valores de estado en HU-004 inicial. `published`/`estado_del_procedimiento='Publicado'` queda fuera porque mezclarlo con `estado_resumen` ampliaría la semántica y produciría ambigüedad frente al DTO `status`. Si una iteración posterior requiere más estados, deberá aprobarse como ampliación documental antes de código.
+
+Decisión concreta: aceptar únicamente `status=presentation` en HU-004 inicial y mapearlo a `estado_resumen='Presentación de oferta'`.
 
 Esta decisión conserva la regla HU-003: todos los resultados siguen siendo abiertos y vigentes.
 
@@ -180,6 +181,26 @@ Construcción recomendada:
 4. Unir predicados con `AND`; los filtros combinados son intersección.
 5. Mantener `$limit=page_size+1`, `$offset` y `$order` de HU-003.
 
+## Verificación viva SECOP para `upper(entidad) like`
+
+Consulta ejecutada como evidencia externa no determinística, de solo lectura y acotada:
+
+```bash
+curl -sS --get 'https://www.datos.gov.co/resource/p6dx-8zbt.json' \
+  --data-urlencode '$select=id_del_proceso,entidad,estado_resumen,fecha_de_recepcion_de' \
+  --data-urlencode '$where=estado_de_apertura_del_proceso="Abierto" AND fecha_de_recepcion_de >= "2026-07-23T00:00:00" AND upper(entidad) like "%MUNICIPIO%"' \
+  --data-urlencode '$limit=1'
+```
+
+Resultado observado:
+
+- HTTP `200`.
+- 1 registro devuelto.
+- Campos presentes: `id_del_proceso`, `entidad`, `estado_resumen`, `fecha_de_recepcion_de`.
+- Muestra: `entidad="MUNICIPIO DE SUCRE"`, `estado_resumen="Presentación de oferta"`, `fecha_de_recepcion_de="2026-07-23T00:00:00.000"`.
+
+Conclusión: Socrata acepta `upper(entidad) like` en el dataset `p6dx-8zbt`; HU-004 puede cerrar la semántica case-insensitive con ese predicado, manteniendo tests determinísticos con stub para implementación posterior.
+
 ## Validaciones
 
 | Caso | Resultado propuesto | Consulta SECOP |
@@ -191,7 +212,7 @@ Construcción recomendada:
 | `closing_from` formato inválido | `422 validation_error`. | No. |
 | `closing_to` formato inválido | `422 validation_error`. | No. |
 | `closing_from > closing_to` | `422 validation_error`. | No. |
-| `closing_to` anterior a hoy Colombia | `200 empty` por short-circuit local. | No recomendado. |
+| `closing_to` anterior a hoy Colombia | `200 empty` por short-circuit local. | No. |
 | `status` no permitido | `422 validation_error`. | No. |
 | parámetro desconocido | `422 validation_error`. | No. |
 | `page`/`page_size` inválidos | `422 validation_error`, igual que HU-003. | No. |
@@ -348,23 +369,23 @@ Usar el mismo patrón de HU-003 con stub SECOP local y sin Internet:
 - Short-circuit local: `closing_to` anterior a hoy evita tráfico externo pero debe comunicar empty, no error.
 - Futuras búsquedas guardadas: HU-004 no persiste filtros; el contrato debe ser estable para HU-008/HU-009 sin implementarlas ahora.
 
-## Decisiones pendientes
+## Decisiones cerradas para HU-004 inicial
 
-Requieren aprobación de Codex/humano antes de código:
+Estas decisiones cierran las opciones pendientes dentro del PR documental y forman el contrato a aprobar antes de código:
 
-1. Ratificar que HU-004 extiende `GET /api/v1/opportunities` con query params opcionales.
-2. Ratificar nombres exactos: `entity`, `closing_from`, `closing_to`, `status`.
-3. Ratificar mínimo/máximo de `entity`: 3..120 caracteres.
-4. Confirmar si `upper(entidad) like` es aceptable tras spike/consulta mínima o si se aprueba una alternativa case-sensitive.
-5. Ratificar que `status` inicial acepta solo `presentation` mapeado a `estado_resumen='Presentación de oferta'`.
-6. Decidir si se agregan más valores de estado desde metadata/consulta viva antes de implementación.
-7. Ratificar que parámetros desconocidos se rechazan con `422`.
-8. Ratificar short-circuit local para `closing_to` anterior a hoy Colombia.
-9. Ratificar que no habrá persistencia de filtros hasta HU-008/HU-009.
+1. HU-004 extiende `GET /api/v1/opportunities` con query params opcionales; no se crea endpoint nuevo.
+2. Nombres exactos de query params: `entity`, `closing_from`, `closing_to`, `status`.
+3. `entity` usa mínimo/máximo 3..120 caracteres después de normalizar espacios.
+4. `entity` usa `upper(entidad) like '%<ENTITY_UPPER_ESCAPED>%'`; la consulta viva SECOP confirmó compatibilidad.
+5. `status` inicial acepta solo `presentation` y mapea a `estado_resumen='Presentación de oferta'`.
+6. No se agregan más valores de estado en HU-004 inicial; cualquier ampliación requiere aprobación documental posterior.
+7. Parámetros desconocidos se rechazan con `422 validation_error`.
+8. `closing_to` anterior a hoy Colombia retorna página vacía mediante short-circuit local y no consulta SECOP.
+9. HU-004 no persiste filtros; persistencia de criterios queda reservada para HU-008/HU-009.
 
 ## Microplan de implementación posterior
 
-1. Confirmar decisiones pendientes y ajustar AC-HU-004 si Codex modifica la propuesta.
+1. Usar las decisiones cerradas de este documento como contrato base; no reabrir endpoint, nombres, estado inicial o persistencia sin aprobación explícita.
 2. RED aplicación: filtros tipados, validaciones, short-circuit y no invocación de SECOP ante errores.
 3. GREEN aplicación: `OpportunityFilters` y extensión del caso de uso conservando paginación HU-003.
 4. RED adaptador: SoQL con predicados opcionales y escaping.

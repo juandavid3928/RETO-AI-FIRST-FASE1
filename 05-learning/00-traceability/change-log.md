@@ -310,4 +310,4 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 
 **Corrección documental:** `user-stories.md`, `acceptance-criteria.md`, `scope-coverage.md` y `README.md` fueron actualizados para reflejar que HU-003 está fusionada en `main` mediante PR #8.
 
-**Decisiones pendientes:** ratificar endpoint extendido, nombres de query params, enum de estado inicial, compatibilidad de `upper(entidad) like`, rechazo de parámetros desconocidos y short-circuit para rangos imposibles antes de autorizar implementación.
+**Decisiones cerradas:** endpoint extendido `GET /api/v1/opportunities`, query params `entity`/`closing_from`/`closing_to`/`status`, entidad 3..120 con `upper(entidad) like`, estado inicial único `presentation`, rechazo de parámetros desconocidos, short-circuit local para `closing_to` anterior a hoy Colombia y no persistencia de filtros hasta HU-008/HU-009.
