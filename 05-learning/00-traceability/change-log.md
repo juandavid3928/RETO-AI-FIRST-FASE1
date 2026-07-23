@@ -289,3 +289,25 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 - La prueba de query inválida falló porque devolvía `Registration data is invalid.`.
 - Las pruebas de settings SECOP fallaron porque `Settings` no exponía `secop_base_url` ni `secop_timeout_seconds`.
 - La prueba de timeout configurable falló porque `SecopOpportunitySource` no aceptaba `timeout_seconds`.
+
+## 2026-07-22 — Analyze HU-004 filter contract
+
+**Tipo:** requisitos | integración externa | frontend | documentación
+
+**Alcance:** análisis/microplan documental para HU-004. No se modificó `06-code/`, no se implementaron backend, frontend, pruebas productivas ni E2E, y no se iniciaron HU-010, HU-006, HU-007, HU-008, HU-009, HU-011 ni otras HUs.
+
+**Estado base verificado:** PR #8 cerrado/fusionado, HU-003 integrada en `main` con merge commit `44a915acd905dadd562279202dd4c71ea5c1a4f0`, `main` sincronizada con `origin/main`, rama `feat/hu-003-explore-opportunities` eliminada local/remotamente y respaldo `backup/repository-structure-a0dfd0a` conservado.
+
+**Resultados:**
+- Se creó `05-learning/03-requirements/hu-004-filter-contract-analysis.md`.
+- Se propone extender `GET /api/v1/opportunities` con query params opcionales `entity`, `closing_from`, `closing_to` y `status`; no endpoint nuevo.
+- `entity` se define como coincidencia parcial case-insensitive sobre `entidad`, con trim, colapso de espacios y longitud 3..120.
+- `closing_from`/`closing_to` se definen como fechas `YYYY-MM-DD` inclusivas sobre `fecha_de_recepcion_de`, interpretadas como fecha civil de Colombia y combinadas con la vigencia HU-003.
+- `status` se recomienda inicialmente como enum `presentation`, mapeado a `estado_resumen='Presentación de oferta'`, manteniendo fijo `estado_de_apertura_del_proceso='Abierto'`.
+- Los filtros inválidos deben responder `422 validation_error`, mensaje `Opportunity query is invalid.`, fields por parámetro y no consultar SECOP.
+- El frontend futuro debe agregar controles accesibles, aplicar/limpiar filtros, preservar resultados ante validación inválida y no persistir criterios hasta HU-008/HU-009.
+- El E2E futuro debe usar stub SECOP determinístico sin Internet para registro, login, perfil y oportunidades filtradas.
+
+**Corrección documental:** `user-stories.md`, `acceptance-criteria.md`, `scope-coverage.md` y `README.md` fueron actualizados para reflejar que HU-003 está fusionada en `main` mediante PR #8.
+
+**Decisiones pendientes:** ratificar endpoint extendido, nombres de query params, enum de estado inicial, compatibilidad de `upper(entidad) like`, rechazo de parámetros desconocidos y short-circuit para rangos imposibles antes de autorizar implementación.

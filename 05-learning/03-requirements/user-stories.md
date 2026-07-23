@@ -2,7 +2,7 @@
 
 ## Estado
 
-Backlog funcional completo. HU-001, HU-002, HU-003 y HU-005 fueron fusionadas o implementadas en la rama vigente. HU-004 y HU-006 a HU-011 no autorizan implementación y requieren aprobación de criterios, contrato y microplan.
+Backlog funcional completo. HU-001, HU-002, HU-003 y HU-005 están fusionadas en `main`; HU-003 quedó integrada mediante PR #8 con merge commit `44a915acd905dadd562279202dd4c71ea5c1a4f0`. HU-004 está en análisis/microplan documental y no autoriza implementación; HU-006 a HU-011 no autorizan implementación y requieren aprobación de criterios, contrato y microplan.
 
 Prioridad:
 
@@ -57,7 +57,7 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Prioridad:** P0.
 - **Dependencias:** HU-002.
 - **Fuente:** OF-01, OF-03, OF-04, OF-06, OF-07; AP-03, AP-04; IN-06, IN-07, IN-09.
-- **Estado:** implementada y validada en `feat/hu-003-explore-opportunities`; pendiente de revisión mediante PR.
+- **Estado:** implementada, validada y fusionada en `main` mediante PR #8; merge commit `44a915acd905dadd562279202dd4c71ea5c1a4f0`.
 - **Criterios:** AC-HU-003-01 a AC-HU-003-05.
 
 ## HU-004 — Filtrar convocatorias
@@ -68,7 +68,7 @@ El orden respeta dependencias y entrega valor incremental sin ciclos.
 - **Prioridad:** P0.
 - **Dependencias:** HU-003.
 - **Fuente:** OF-01, OF-03, OF-06; IN-02, IN-08, IN-09.
-- **Estado:** agregada al dividir el alcance de búsqueda de la HU-003 original; pendiente de aprobación para implementación.
+- **Estado:** análisis/microplan documental iniciado en `docs/hu-004-filter-contract-analysis`; pendiente de aprobación para implementación.
 - **Criterios:** AC-HU-004-01 a AC-HU-004-04.
 
 ## HU-005 — Consultar el perfil propio

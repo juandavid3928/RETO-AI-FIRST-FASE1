@@ -2,7 +2,7 @@
 
 ## Estado
 
-Matriz vigente. HU-001, HU-002 y HU-005 están fusionadas; HU-003 está implementada y validada en la rama vigente. Ninguna otra HU está iniciada ni autorizada por esta actualización.
+Matriz vigente. HU-001, HU-002, HU-003 y HU-005 están implementadas, validadas y fusionadas en `main`; HU-003 quedó integrada mediante PR #8 con merge commit `44a915acd905dadd562279202dd4c71ea5c1a4f0`. HU-004 está en análisis/microplan documental y no autoriza implementación. Ninguna otra HU está iniciada ni autorizada por esta actualización.
 
 ## Matriz requisito → historias
 
@@ -13,7 +13,7 @@ Matriz vigente. HU-001, HU-002 y HU-005 están fusionadas; HU-003 está implemen
 | OF-03 | REST para búsqueda, filtros y bookmarks. | HU-003, HU-004, HU-006, HU-007, HU-010. | Completa a nivel funcional; HU-010 reutiliza el contrato mínimo de convocatoria. |
 | OF-04 | Web funcional para browse, favoritos y perfil. | HU-003, HU-004, HU-005, HU-006, HU-007, HU-010, HU-011. | Completa a nivel funcional; detalle y dashboard se limitan a AP-07. |
 | OF-05 | Persistencia de usuarios, bookmarks y búsquedas guardadas. | HU-001, HU-005, HU-006, HU-007, HU-008, HU-009. | Modelo físico de usuarios implementado; bookmarks y búsquedas pendientes. |
-| OF-06 | Consulta SECOP en vivo por entidad, fecha y estado. | HU-003, HU-004, HU-009. | Completa; dataset y mapeo pendientes. |
+| OF-06 | Consulta SECOP en vivo por entidad, fecha y estado. | HU-003, HU-004, HU-009. | HU-003 integró dataset `p6dx-8zbt` y browse vigente; HU-004 documenta contrato de filtros por entidad/fecha/estado; búsquedas guardadas pendientes. |
 | OF-07 | E2E auth + browse + bookmarks persistidos. | HU-001, HU-002, HU-003, HU-006, HU-007, HU-010. | Completa como flujo incremental; el detalle mínimo apoya la decisión previa al bookmark. |
 | OF-08 | Aplicación local con backend, frontend, DB e integración. | TT-02, TT-04, TT-05, TT-07 y slices de todas las HU. | Tarea de entrega, no HU independiente. |
 | OF-09 | Repo público, README, SOUL y demo. | TT-08. | Tarea de entrega y trazabilidad. |
@@ -24,8 +24,8 @@ Matriz vigente. HU-001, HU-002 y HU-005 están fusionadas; HU-003 está implemen
 |---|---|---|---|---|
 | HU-001 | OF-01, OF-02, OF-05 | — | P0 | Implementada, validada y fusionada. |
 | HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Implementada, validada y fusionada. |
-| HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Implementada y validada en `feat/hu-003-explore-opportunities`; pendiente de PR. |
-| HU-004 | OF-01, OF-03, OF-06 | HU-003 | P0 | Agregada por división; pendiente. |
+| HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Implementada, validada y fusionada mediante PR #8 (`44a915acd905dadd562279202dd4c71ea5c1a4f0`). |
+| HU-004 | OF-01, OF-03, OF-06 | HU-003 | P0 | En análisis/microplan documental; pendiente de aprobación para implementación. |
 | HU-005 | OF-02, OF-04 | HU-002 | P0 | Implementada, validada y fusionada. |
 | HU-006 | OF-01, OF-03, OF-04, OF-05, OF-07 | HU-002, HU-003 | P0 | Agregada; pendiente. |
 | HU-007 | OF-01, OF-03, OF-04, OF-05, OF-07 | HU-006 | P0 | Agregada; pendiente. |

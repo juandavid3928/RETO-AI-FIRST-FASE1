@@ -264,3 +264,14 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Defaults: `SECOP_BASE_URL=https://www.datos.gov.co/resource/p6dx-8zbt.json` y `SECOP_TIMEOUT_SECONDS=5`.
 - Adaptador SECOP: recibe timeout configurable y lo aplica a la solicitud HTTP externa.
 - Persistencia y alcance: no se agregaron migraciones, tablas ni persistencia de oportunidades.
+
+## Checkpoint — 2026-07-22 — Análisis documental HU-004 filtros
+
+- Alcance: análisis/microplan documental de HU-004 — Filtrar convocatorias. No se modificó `06-code/`, no se crearon pruebas productivas ni E2E y no se inició HU-010, HU-006, HU-007, HU-008, HU-009, HU-011 ni otra HU.
+- Estado base: HU-003 fusionada en `main` mediante PR #8; merge commit `44a915acd905dadd562279202dd4c71ea5c1a4f0`; `main` sincronizada con `origin/main` antes de crear `docs/hu-004-filter-contract-analysis`.
+- Contrato propuesto: extender `GET /api/v1/opportunities` con query params opcionales `entity`, `closing_from`, `closing_to` y `status`, preservando Bearer JWT, paginación, DTO, headers privados y errores de HU-003.
+- Semántica propuesta: `entity` usa coincidencia parcial case-insensitive sobre `entidad` con normalización 3..120 caracteres; fechas `YYYY-MM-DD` inclusivas sobre `fecha_de_recepcion_de` en fecha civil Colombia; `status` inicial recomendado como `presentation` mapeado a `estado_resumen='Presentación de oferta'` sin relajar `estado_de_apertura_del_proceso='Abierto'`.
+- Validaciones: filtros inválidos devuelven `422 validation_error` con mensaje `Opportunity query is invalid.`, fields por parámetro y garantía de no consultar SECOP; filtros válidos sin coincidencias producen `empty`, no error externo.
+- Frontend propuesto: formulario accesible con entidad, rango, estado, aplicar y limpiar; conserva resultados ante errores de validación, reinicia a página 1 al aplicar y no persiste filtros hasta HU-008/HU-009.
+- Riesgos: SoQL/encoding, rate limits, campos SECOP inconsistentes, ambigüedad de estado, paginación con filtros y bordes de fecha.
+- Decisiones pendientes: ratificar endpoint extendido, nombres de query params, enum de estado, uso de `upper(entidad) like`, rechazo de parámetros desconocidos y short-circuit para rangos imposibles antes de autorizar código.
