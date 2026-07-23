@@ -8,6 +8,7 @@ Backlog funcional completo propuesto para revisión. No autoriza implementación
 - `user-stories.md`: once HU priorizadas, dependencias, valor, fuentes y tareas técnicas separadas.
 - `acceptance-criteria.md`: criterios observables por HU en formato Dado/Cuando/Entonces.
 - `hu-003-secop-contract-analysis.md`: propuesta documental de fuente SECOP II, contrato, DTO, límites, riesgos y microplan TDD para HU-003.
+- `hu-004-filter-contract-analysis.md`: propuesta documental de contrato de filtros, query params, mapeo SECOP, validaciones, frontend, TDD y E2E para HU-004.
 - `scope-coverage.md`: matrices de trazabilidad, grafo de dependencias y evaluación del backlog anterior.
 
 ## Autoridad
@@ -36,4 +37,4 @@ Una HU no pasa a código hasta que Codex y el humano aprueben sus criterios, con
 - HU-010: consultar detalle de convocatoria.
 - HU-011: visualizar dashboard resumen.
 
-Estado de todas: pendientes de aprobación para implementación.
+Estado: HU-001, HU-002, HU-003 y HU-005 fusionadas en `main`; HU-004 queda en análisis/microplan documental y no autoriza implementación; HU-006 a HU-011 continúan pendientes de aprobación para implementación.
