@@ -2,7 +2,7 @@
 
 ## Estado
 
-Matriz vigente. HU-001, HU-002 y HU-005 están fusionadas. Ninguna otra HU está iniciada ni autorizada por esta actualización.
+Matriz vigente. HU-001, HU-002 y HU-005 están fusionadas; HU-003 está implementada y validada en la rama vigente. Ninguna otra HU está iniciada ni autorizada por esta actualización.
 
 ## Matriz requisito → historias
 
@@ -24,7 +24,7 @@ Matriz vigente. HU-001, HU-002 y HU-005 están fusionadas. Ninguna otra HU está
 |---|---|---|---|---|
 | HU-001 | OF-01, OF-02, OF-05 | — | P0 | Implementada, validada y fusionada. |
 | HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Implementada, validada y fusionada. |
-| HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Refinada; pendiente de aprobación. |
+| HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Implementada y validada en `feat/hu-003-explore-opportunities`; pendiente de PR. |
 | HU-004 | OF-01, OF-03, OF-06 | HU-003 | P0 | Agregada por división; pendiente. |
 | HU-005 | OF-02, OF-04 | HU-002 | P0 | Implementada, validada y fusionada. |
 | HU-006 | OF-01, OF-03, OF-04, OF-05, OF-07 | HU-002, HU-003 | P0 | Agregada; pendiente. |

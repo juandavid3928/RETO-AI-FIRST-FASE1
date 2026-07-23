@@ -83,7 +83,8 @@ export function ProfilePage() {
           <div><dt className="text-sm text-slate-400">Email</dt><dd>{state.profile.email}</dd></div>
           <div><dt className="text-sm text-slate-400">Created at</dt><dd>{state.profile.created_at}</dd></div>
         </dl>
-        <button className="mt-8 w-full rounded-lg bg-amber-300 px-4 py-3 font-bold text-slate-950" type="button" onClick={logout}>Log out</button>
+        <button className="mt-8 w-full rounded-lg bg-amber-300 px-4 py-3 font-bold text-slate-950" type="button" onClick={() => navigate('/opportunities')}>Explore opportunities</button>
+        <button className="mt-4 w-full rounded-lg border border-slate-600 px-4 py-3 font-bold text-slate-100" type="button" onClick={logout}>Log out</button>
       </section>
     </main>
   )

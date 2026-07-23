@@ -2,7 +2,7 @@
 
 ## Estado y convención
 
-Los criterios de HU-001, HU-002 y HU-005 están aprobados e implementados en `main`. HU-003, HU-004 y HU-006 a HU-011 continúan propuestos y no autorizan implementación.
+Los criterios de HU-001, HU-002 y HU-005 están aprobados e implementados en `main`. HU-003 está implementada y validada en la rama vigente para revisión mediante PR. HU-004 y HU-006 a HU-011 continúan propuestos y no autorizan implementación.
 
 ## HU-001 — Crear una cuenta
 
