@@ -7,6 +7,7 @@ Backlog funcional completo propuesto para revisión. No autoriza implementación
 - `project-understanding.md`: problema, actores, flujo, fuentes, reglas, límites, inferencias y decisiones pendientes.
 - `user-stories.md`: once HU priorizadas, dependencias, valor, fuentes y tareas técnicas separadas.
 - `acceptance-criteria.md`: criterios observables por HU en formato Dado/Cuando/Entonces.
+- `hu-003-secop-contract-analysis.md`: propuesta documental de fuente SECOP II, contrato, DTO, límites, riesgos y microplan TDD para HU-003.
 - `scope-coverage.md`: matrices de trazabilidad, grafo de dependencias y evaluación del backlog anterior.
 
 ## Autoridad

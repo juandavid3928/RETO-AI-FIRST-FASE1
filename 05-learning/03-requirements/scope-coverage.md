@@ -2,14 +2,14 @@
 
 ## Estado
 
-Matriz vigente. HU-001 y HU-002 están fusionadas; HU-005 tiene implementación autorizada en su rama. Ninguna otra HU está iniciada ni autorizada por esta actualización.
+Matriz vigente. HU-001, HU-002 y HU-005 están fusionadas. Ninguna otra HU está iniciada ni autorizada por esta actualización.
 
 ## Matriz requisito → historias
 
 | Requisito | Descripción resumida | Historias que lo cubren | Cobertura |
 |---|---|---|---|
 | OF-01 | Explorar, filtrar y guardar convocatorias como usuario registrado. | HU-001, HU-002, HU-003, HU-004, HU-006, HU-007. | Completa. |
-| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Incrementos implementados; HU-005 pendiente de revisión mediante PR. |
+| OF-02 | Registro, login JWT y perfil propio. | HU-001, HU-002, HU-005. | Incrementos implementados y fusionados. |
 | OF-03 | REST para búsqueda, filtros y bookmarks. | HU-003, HU-004, HU-006, HU-007, HU-010. | Completa a nivel funcional; HU-010 reutiliza el contrato mínimo de convocatoria. |
 | OF-04 | Web funcional para browse, favoritos y perfil. | HU-003, HU-004, HU-005, HU-006, HU-007, HU-010, HU-011. | Completa a nivel funcional; detalle y dashboard se limitan a AP-07. |
 | OF-05 | Persistencia de usuarios, bookmarks y búsquedas guardadas. | HU-001, HU-005, HU-006, HU-007, HU-008, HU-009. | Modelo físico de usuarios implementado; bookmarks y búsquedas pendientes. |
@@ -26,7 +26,7 @@ Matriz vigente. HU-001 y HU-002 están fusionadas; HU-005 tiene implementación 
 | HU-002 | OF-01, OF-02, OF-07 | HU-001 | P0 | Implementada, validada y fusionada. |
 | HU-003 | OF-01, OF-03, OF-04, OF-06, OF-07 | HU-002 | P0 | Refinada; pendiente de aprobación. |
 | HU-004 | OF-01, OF-03, OF-06 | HU-003 | P0 | Agregada por división; pendiente. |
-| HU-005 | OF-02, OF-04 | HU-002 | P0 | Implementada y validada en `feat/hu-005-own-profile`; pendiente de revisión mediante PR. |
+| HU-005 | OF-02, OF-04 | HU-002 | P0 | Implementada, validada y fusionada. |
 | HU-006 | OF-01, OF-03, OF-04, OF-05, OF-07 | HU-002, HU-003 | P0 | Agregada; pendiente. |
 | HU-007 | OF-01, OF-03, OF-04, OF-05, OF-07 | HU-006 | P0 | Agregada; pendiente. |
 | HU-008 | OF-05 | HU-004 | P0 | Agregada con inferencia explícita; pendiente. |
@@ -100,16 +100,17 @@ Orden recomendado: HU-001, HU-002, HU-005, HU-003, HU-004, HU-010, HU-006, HU-00
 
 ## Riesgos y decisiones pendientes
 
-- La fuente oficial ofrece un endpoint SECOP I como ejemplo, pero no fija el dataset definitivo.
+- Fuente recomendada para HU-003: datos.gov.co `SECOP II - Procesos de Contratación` (`p6dx-8zbt`) mediante el backend.
+- Contrato propuesto: `GET /api/v1/opportunities`, privado, paginado, con DTO normalizado y `id_del_proceso` como clave estable propuesta.
+- Vigencia propuesta: `estado_de_apertura_del_proceso = 'Abierto'` y `fecha_de_recepcion_de >= fecha actual`; registros sin fecha de recepción confiable quedan fuera del listado inicial.
 - La política de contraseña, JWT y perfil mínimo están resueltas para HU-001, HU-002 y HU-005; cualquier ampliación requiere aprobación separada.
-- Faltan DTO, paginación, orden y semántica exacta de fecha/estado.
 - La política de nombre único para búsquedas guardadas es una inferencia y requiere ratificación.
-- El backlog propone browse y filtros privados a partir de “usuarios registrados”, pero debe ratificarse si habrá consulta pública.
+- Debe ratificarse que HU-003 permanece privada; el backlog actual la define para usuario autenticado.
 - Debe definirse qué snapshot mínimo conserva un bookmark y cómo se representa una convocatoria retirada.
 - Falta ratificar el mapeo exacto de los campos mínimos del detalle HU-010 dentro del DTO.
 - Falta decidir si HU-011 resume la página vigente o una consulta predeterminada y cómo comunica el límite del conjunto.
 - El dashboard podría confundirse con analítica; se mantiene explícitamente restringido a datos de HU-003, HU-007 y HU-009.
-- Caché, reintentos, rate limits y timeouts requieren decisión técnica sin crear nuevas HU.
+- Caché, reintentos, rate limits, disponibilidad de datos.gov.co, cambios de esquema y timeout externo inicial de 5 segundos requieren aprobación técnica sin crear nuevas HU.
 - Faltan umbrales verificables de accesibilidad, rendimiento y observabilidad sin datos sensibles.
 
 ## Fuera de alcance

@@ -231,3 +231,14 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 ### Respaldo y siguiente acción
 - Se conserva `backup/repository-structure-a0dfd0a` en `a0dfd0a5250fadd372d8c4d8e3a32a0504710f70` para preservar el checkpoint de la estructura limpia inicial.
 - Al reanudar: analizar HU-003 y confirmar el dataset y el contrato de SECOP II. No implementar HU-003 sin una nueva instrucción de Codex.
+
+## Checkpoint — 2026-07-22 — Análisis documental HU-003 SECOP II
+
+- Alcance: análisis técnico/documental previo a implementación de HU-003; no se modificó `06-code/` ni se inició ninguna HU.
+- Estado Git previo: PR #6 fusionado mediante GitHub, `main` sincronizada por fast-forward y rama `docs/project-pause-checkpoint` eliminada local/remotamente después de verificar que `00d3dc9cace43273a7914d13ee6f522b1dc776c8` quedó como ancestro de `main`.
+- Fuente recomendada: datos.gov.co `SECOP II - Procesos de Contratación` (`p6dx-8zbt`), consultado por el backend mediante `https://www.datos.gov.co/resource/p6dx-8zbt.json`.
+- Definición propuesta de vigencia: `estado_de_apertura_del_proceso = 'Abierto'` y `fecha_de_recepcion_de >= fecha actual`; registros sin fecha de recepción confiable quedan fuera del browse inicial.
+- Contrato propuesto: `GET /api/v1/opportunities`, privado con Bearer JWT, paginado (`page=1`, `page_size=20`, máximo 50), timeout externo inicial de 5 segundos, orden por cierre ascendente y DTO normalizado con `id_del_proceso` como clave estable propuesta.
+- Estados UI definidos: `loading`, `empty`, `external_error` y `success`; frontend consume únicamente API propia y no llama directamente a datos.gov.co.
+- Riesgos documentados: disponibilidad/rate limits de datos.gov.co, cambios de esquema, datos incompletos, semántica de vigencia, duplicados y monto COP sin conversión a centavos en el listado.
+- Decisiones pendientes: ratificar dataset, clave estable, fecha de vigencia, endpoint/DTO, privacidad, paginación/orden/timeout antes de autorizar implementación TDD.

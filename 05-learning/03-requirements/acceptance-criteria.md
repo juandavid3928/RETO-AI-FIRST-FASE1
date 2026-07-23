@@ -2,7 +2,7 @@
 
 ## Estado y convención
 
-Los criterios de HU-001, HU-002 y HU-005 están aprobados. HU-005 se implementó y validó en su rama y permanece pendiente de revisión mediante PR; HU-003, HU-004 y HU-006 a HU-011 continúan propuestos y no autorizan implementación.
+Los criterios de HU-001, HU-002 y HU-005 están aprobados e implementados en `main`. HU-003, HU-004 y HU-006 a HU-011 continúan propuestos y no autorizan implementación.
 
 ## HU-001 — Crear una cuenta
 
@@ -48,23 +48,23 @@ Los criterios de HU-001, HU-002 y HU-005 están aprobados. HU-005 se implementó
 
 ### AC-HU-003-01 — Consulta por medio del backend
 
-**Dado** un usuario autenticado, **cuando** abre la exploración de convocatorias, **entonces** el frontend consulta la API propia y el backend realiza la consulta acordada a SECOP; el navegador no llama directamente a datos.gov.co.
+**Dado** un usuario autenticado, **cuando** abre la exploración de convocatorias, **entonces** el frontend consulta `GET /api/v1/opportunities` en la API propia y el backend consulta el dataset oficial SECOP II acordado; el navegador no llama directamente a datos.gov.co ni a `community.secop.gov.co` para obtener el listado.
 
 ### AC-HU-003-02 — Resultado normalizado
 
-**Dada** una respuesta válida de SECOP, **cuando** el backend la procesa, **entonces** entrega una lista con el DTO estable acordado y cada elemento incluye la clave externa necesaria para identificarlo.
+**Dada** una respuesta válida de SECOP II con convocatorias abiertas y fecha de recepción vigente, **cuando** el backend la procesa, **entonces** entrega una lista paginada con el DTO estable acordado, incluyendo como mínimo `id`, `reference`, `entity_name`, `title`, `status`, `summary_status`, `opening_status`, `published_at`, `closing_at`, `estimated_amount_cop` y `source_url`, y usa `id_del_proceso` como clave externa propuesta.
 
 ### AC-HU-003-03 — Estados de interfaz
 
-**Dada** una consulta, **cuando** está en curso, devuelve elementos o no devuelve ninguno, **entonces** la interfaz diferencia explícitamente loading, results y empty.
+**Dada** una consulta de convocatorias, **cuando** está en curso, termina sin elementos, falla por integración externa o devuelve elementos válidos, **entonces** la interfaz diferencia explícitamente `loading`, `empty`, `external_error` y `success` sin presentar datos obsoletos como vigentes.
 
 ### AC-HU-003-04 — Fallo externo controlado
 
-**Dado** un timeout, error HTTP o payload inválido de SECOP, **cuando** se exploran convocatorias, **entonces** la API y la interfaz presentan un error controlado y no datos parciales presentados como exitosos.
+**Dado** un timeout, rate limit, error HTTP, JSON inválido o payload sin campos mínimos de SECOP II, **cuando** se exploran convocatorias, **entonces** la API responde con un error estable y la interfaz presenta un error recuperable sin exponer detalles internos ni datos parciales presentados como exitosos.
 
 ### AC-HU-003-05 — Acceso privado
 
-**Dado** un visitante sin sesión válida, **cuando** intenta explorar convocatorias, **entonces** no obtiene los resultados privados del portal.
+**Dado** un visitante sin sesión válida, **cuando** intenta explorar convocatorias, **entonces** no obtiene el listado ni datos derivados de SECOP a través del portal.
 
 ## HU-004 — Filtrar convocatorias
 
