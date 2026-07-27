@@ -275,3 +275,34 @@ Revisar en Codex el diff completo del PR #2 con HU-010/HU-011 y sus 43 criterios
 - Frontend propuesto: formulario accesible con entidad, rango, estado, aplicar y limpiar; conserva resultados ante errores de validación, reinicia a página 1 al aplicar y no persiste filtros hasta HU-008/HU-009.
 - Riesgos: SoQL/encoding, rate limits, campos SECOP inconsistentes, ambigüedad de estado, paginación con filtros y bordes de fecha.
 - Decisiones cerradas para HU-004 inicial: endpoint extendido, query params `entity`/`closing_from`/`closing_to`/`status`, entidad 3..120 con `upper(entidad) like`, estado único `presentation`, rechazo de parámetros desconocidos, short-circuit local para rangos imposibles y no persistencia de filtros hasta HU-008/HU-009.
+
+## Checkpoint — 2026-07-22 — Pausa tras contrato documental HU-004
+
+### Estado real verificado
+- Rama base antes de esta pausa: `main`.
+- `main` local y `origin/main` sincronizadas en `a77aed42946de596e733413f5d8857757bb2b410`.
+- Working tree limpio antes de crear `docs/pause-after-hu-004-contract`.
+- PR #8 fusionado mediante GitHub con merge commit `44a915acd905dadd562279202dd4c71ea5c1a4f0`; HU-003 quedó integrada en `main`.
+- PR #9 fusionado mediante GitHub con merge commit `a77aed42946de596e733413f5d8857757bb2b410`; el análisis/microplan documental de HU-004 quedó integrado en `main`.
+- Ramas previas `feat/hu-003-explore-opportunities` y `docs/hu-004-filter-contract-analysis` eliminadas local y remotamente tras sus merges.
+- Rama de respaldo `backup/repository-structure-a0dfd0a` conservada en `a0dfd0a5250fadd372d8c4d8e3a32a0504710f70`.
+
+### Avances completados
+- HU-003 implementada: endpoint privado `GET /api/v1/opportunities` integrado, browse SECOP II vigente funcionando desde API propia, frontend `/opportunities` privado y validación full-stack reportada en PR #8.
+- HU-004 cerró únicamente su contrato documental: no hubo implementación, no hubo cambios en `06-code/`, no se crearon backend, frontend, pruebas productivas ni E2E.
+- Contrato HU-004 acordado a nivel documental: extender `GET /api/v1/opportunities`, no crear endpoint nuevo.
+
+### Decisiones cerradas para HU-004
+- Query params: `entity`, `closing_from`, `closing_to`, `status`.
+- `entity`: filtra sobre SECOP `entidad`, coincidencia parcial, case-insensitive mediante `upper(entidad) like`, normalización de espacios y longitud 3..120.
+- `closing_from` y `closing_to`: filtran sobre `fecha_de_recepcion_de`, son inclusivos, usan formato `YYYY-MM-DD` y se interpretan como fecha civil de Colombia.
+- `status=presentation`: mapea a `estado_resumen='Presentación de oferta'`.
+- `estado_de_apertura_del_proceso='Abierto'` permanece como regla base heredada de HU-003 y no se expone como filtro libre.
+- Parámetros desconocidos responden `422 validation_error`.
+- `closing_to` anterior a hoy Colombia produce short-circuit local `empty` sin consultar SECOP.
+- HU-004 no persiste filtros; guardar criterios queda reservado para HU-008/HU-009.
+
+### Pendiente al reanudar
+- Implementar HU-004 únicamente cuando Codex lo autorice, en una rama nueva desde `main` sincronizada.
+- No iniciar HU-010, favoritos, búsquedas guardadas ni dashboard durante HU-004.
+- Mantener la regla de oro: rama → validaciones → commit → push → PR → revisión → merge por GitHub; sin merge local ni push directo a `main`.

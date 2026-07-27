@@ -311,3 +311,17 @@ Los fallos RED observados antes de cada segmento quedaron fuera del repositorio 
 **Corrección documental:** `user-stories.md`, `acceptance-criteria.md`, `scope-coverage.md` y `README.md` fueron actualizados para reflejar que HU-003 está fusionada en `main` mediante PR #8.
 
 **Decisiones cerradas:** endpoint extendido `GET /api/v1/opportunities`, query params `entity`/`closing_from`/`closing_to`/`status`, entidad 3..120 con `upper(entidad) like`, estado inicial único `presentation`, rechazo de parámetros desconocidos, short-circuit local para `closing_to` anterior a hoy Colombia y no persistencia de filtros hasta HU-008/HU-009.
+
+## 2026-07-22 — Record pause after HU-004 contract
+
+**Tipo:** documentación | pausa | trazabilidad
+
+**Alcance:** checkpoint de pausa posterior al cierre documental de HU-004. No se modificó `06-code/`, no se implementó HU-004 y no se inició HU-010 ni otra HU.
+
+**Estado real registrado:**
+- PR #8/HU-003 está fusionado en `main` mediante merge commit `44a915acd905dadd562279202dd4c71ea5c1a4f0`.
+- PR #9/análisis HU-004 está fusionado en `main` mediante merge commit `a77aed42946de596e733413f5d8857757bb2b410`.
+- `main` local y `origin/main` se verificaron sincronizadas en `a77aed42946de596e733413f5d8857757bb2b410` antes de crear la rama de pausa.
+- Las ramas previas de HU-003 y HU-004 documental están eliminadas local/remotamente; `backup/repository-structure-a0dfd0a` permanece conservada.
+
+**Pendiente:** reanudar con implementación HU-004 solo bajo nueva autorización, en rama nueva, sin iniciar HU-010, favoritos, búsquedas guardadas ni dashboard.
